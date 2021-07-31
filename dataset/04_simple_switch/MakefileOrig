@@ -1,0 +1,2 @@
+all:
+	clang -m32 -o 04_simple_switch.orig 04_simple_switch.c

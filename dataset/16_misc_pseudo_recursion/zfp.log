@@ -1,0 +1,16 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+current: storage/final-dataset/16_misc_pseudo_recursion/
+number of value sets identified: 5
+number of opaque predicates: 3
+time it takes to obfuscate (seconds): 7.138216925999984
+time it takes to obfuscate (formatted): 0:00:07.138217
+Frama-C runtime (seconds): 0.7412556990000212
+Frama-C runtime (formatted): 0:00:00.741256
+value sets that didn't make it as opaque predicates, or unsat(0)
+value sets that didn't make it as value sets since it's only zero(2)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+values that are unsat: 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+values that are too simple: 
+'/tmp/zfp-0.6686462146592415/16_misc_pseudo_recursion.c:44:file:{0}'
+'/tmp/zfp-0.6686462146592415/16_misc_pseudo_recursion.c:50:file:{0}'

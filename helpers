@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Build docker images
+buildc ()
+{
+  docker build . --tag zfp-clang -f docker-clang
+  docker build . --tag zfp-main -f docker-main
+}
+
+# remove all stopped containers
+killc ()
+{
+  docker rm $(docker ps -a -q)
+}
+
+# start analysis
+startc ()
+{
+  docker run -t -d -v $(pwd)/storage:/host-storage --name zfp-main zfp-main
+  docker run -t -d -v $(pwd)/storage:/host-storage --name zfp-clang zfp-clang
+  MAIN_ID=$(docker ps -qf "name=^zfp-main$")
+  CLANG_ID=$(docker ps -qf "name=^zfp-clang$")
+}
+
+# stop analysis
+stopc ()
+{
+  docker rm -f $MAIN_ID
+  docker rm -f $CLANG_ID
+#  docker volume rm zfp-data
+  $rmc
+}
+
+# attach to container terminal
+attachc ()
+{
+  if [[ "$1" = "main" ]] 
+  then
+    docker exec -it $MAIN_ID /bin/bash  
+  else 
+    docker exec -it $CLANG_ID /bin/bash  
+  fi
+}
+
+# tar the llvm folders under install since we untar it in docker-main
+tar_llvm ()
+{
+  tar -czvf ./installs/llvm/llvm-3.8.0.src.tar.gz ./installs/llvm/llvm-3.8.0.src
+}
+
+# remove zfp metadata 
+rmm ()
+{
+  rm -rf zfp-0.*
+}
+
+# detach from container terminal: Ctrl-P n Ctrl-Q
+# how to de-attach: https://stackoverflow.com/questions/19688314/how-do-you-attach-and-detach-from-dockers-process
+
+
+# count line numbers in file excluding comments and spaces
+countlines()
+{
+  # to remove blank lines: 
+  # https://stackoverflow.com/questions/114814/count-non-blank-lines-of-code-in-bash
+  # to remove C comments:
+  # https://unix.stackexchange.com/questions/317795/remove-comments-in-a-c-file
+  perl -0777 -pe 's,/\*.*?\*/,,gs' ${1} | sed '/^\s*$/d' | wc -l
+}

@@ -1,0 +1,2 @@
+all:
+	clang -m32 -o 01_simple_if 01_simple_if.c

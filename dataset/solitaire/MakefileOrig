@@ -1,0 +1,3 @@
+all: 
+	clang -g -m32 -o solitaire.orig solitaire.c 
+

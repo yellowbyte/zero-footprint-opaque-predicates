@@ -1,0 +1,19 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+current: storage/final-dataset/11_loop_while_do_continue/
+number of value sets identified: 11
+number of opaque predicates: 6
+time it takes to obfuscate (seconds): 13.820025610000016
+time it takes to obfuscate (formatted): 0:00:13.820026
+Frama-C runtime (seconds): 1.0339132550000159
+Frama-C runtime (formatted): 0:00:01.033913
+value sets that didn't make it as opaque predicates, or unsat(0)
+value sets that didn't make it as value sets since it's only zero(5)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+values that are unsat: 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+values that are too simple: 
+'/tmp/zfp-0.7199662252291267/11_loop_while_do_continue.c:6:val:{0}'
+'/tmp/zfp-0.7199662252291267/11_loop_while_do_continue.c:7:i:{0}'
+'/tmp/zfp-0.7199662252291267/11_loop_while_do_continue.c:13:file:{0}'
+'/tmp/zfp-0.7199662252291267/11_loop_while_do_continue.c:26:file:{0}'
+'/tmp/zfp-0.7199662252291267/11_loop_while_do_continue.c:35:file:{0}'

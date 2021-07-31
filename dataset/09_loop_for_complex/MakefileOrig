@@ -1,0 +1,2 @@
+all:
+	clang -m32 -o 09_loop_for_complex.orig 09_loop_for_complex.c

@@ -1,0 +1,2 @@
+all:
+	clang -m32 -o 17_complex_function_pointers.orig 17_complex_function_pointers.c

@@ -1,0 +1,2 @@
+all:
+	clang -m32 -o 10_loop_while_continue.orig 10_loop_while_continue.c

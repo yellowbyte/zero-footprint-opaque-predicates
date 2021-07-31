@@ -1,0 +1,2 @@
+all:
+	clang -m32 -o 05_simple_goto.orig 05_simple_goto.c

@@ -1,0 +1,21 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+current: storage/tweetnacl-usable
+number of value sets identified: 118
+number of opaque predicates: 111
+time it takes to obfuscate (seconds): 171.97334888499972
+time it takes to obfuscate (formatted): 0:02:51.973349
+Frama-C runtime (seconds): 5.797563891999744
+Frama-C runtime (formatted): 0:00:05.797564
+value sets that didn't make it as opaque predicates, or unsat(0)
+value sets that didn't make it as value sets since it's only zero(7)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+values that are unsat: 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+values that are too simple: 
+'/tmp/zfp-0.8675510884400575/randombytes.c:8:failed:{0}'
+'/tmp/zfp-0.8675510884400575/tweetnacl.c:150:u:{0}'
+'/tmp/zfp-0.8675510884400575/tweetnacl.c:183:u:{0}'
+'/tmp/zfp-0.8675510884400575/tweetnacl.c:48:d:{0}'
+'/tmp/zfp-0.8675510884400575/tweetnacl.c:205:n:{0}'
+'/tmp/zfp-0.8675510884400575/tweetnacl.c:205:c[16]:{0}'
+'/tmp/zfp-0.8675510884400575/randombytes.c:34:failed:{0}'

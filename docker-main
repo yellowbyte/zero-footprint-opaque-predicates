@@ -1,0 +1,98 @@
+FROM ubuntu:bionic
+MAINTAINER Yu-Jye Tung
+
+### Privilege for some installations
+USER root
+
+### Install common necessary packages
+RUN apt-get clean
+RUN apt-get -y update && DEBIAN_FRONTEND=noninteractive apt-get -y install python3 python3-pip git 
+RUN apt-get install -y build-essential && \
+    apt-get update && \
+    apt-get install -y vim \
+                       libgmp-dev \
+                       tar \
+                       perl \
+                       pkg-config \
+                       autoconf \
+                       automake \
+                       graphviz \
+                       libgnomecanvas2-dev \
+                       libgtksourceview2.0-dev \
+                       libgtk-3-dev \
+                       m4 \
+                       cmake \
+                       flex \
+                       libboost-all-dev \
+                       libboost-dev \
+                       libboost-test-dev \
+                       libboost-system-dev \
+                       libc6 \
+                       libc6-dev \
+                       libstdc++6 \
+                       llvm \
+                       llvm-dev \
+                       gcc-multilib \
+                       libffi-dev \
+                       libz-dev \
+                       software-properties-common \
+                       clang \
+                       jq \
+                       wget \
+                       time \
+                       zlib1g-dev
+### To install OPAM 2 on Ubuntu Bionic
+RUN apt-get update
+RUN add-apt-repository ppa:avsm/ppa
+RUN apt-get update
+RUN apt-get -y install opam
+
+### Install Rosette (Racket)
+RUN mkdir /rosette-install
+WORKDIR /rosette-install
+# racket install script is too big to store in git
+RUN wget https://mirror.racket-lang.org/installers/7.8/racket-7.8-x86_64-linux.sh
+RUN chmod 755 racket-7.8-x86_64-linux.sh
+RUN echo "yes\n1\n" | sh racket-7.8-x86_64-linux.sh
+RUN raco setup
+RUN raco pkg install custom-load
+RUN raco pkg install rfc6455
+RUN raco pkg install rosette
+# Get Rosette code
+COPY ./installs/rosette/expr-gen.rkt /synthesis/
+COPY ./installs/rosette/get_synthesis.sh /synthesis/
+
+### Install LLVM 3.8.0
+RUN mkdir /llvm-base
+COPY ./installs/llvm/llvm-3.8.0.src.tar.gz /
+WORKDIR /
+RUN tar xf llvm-3.8.0.src.tar.gz
+RUN mv installs/llvm/llvm-3.8.0.src/* /llvm-base
+RUN rm -rf llvm-3.8.0.src
+WORKDIR /llvm-base/build
+RUN cmake /llvm-base \
+    -G "Unix Makefiles" -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DCMAKE_BUILD_TYPE=MinSizeRel
+RUN cmake --build .
+RUN cmake --build . --target install
+
+###  Install Frama-C
+#RUN eval $(opam env) && opam init --disable-sandboxing && opam install -y frama-c
+# Version lock instead of installing newest version of Frama-C
+RUN eval $(opam env) && opam init --disable-sandboxing && opam install -y depext && opam depext frama-c && opam install -y --deps-only frama-c
+COPY ./installs/frama-c/frama-c-21.1-Scandium.tar.gz / 
+WORKDIR /
+RUN tar xf frama-c-21.1-Scandium.tar.gz
+RUN opam pin add -y --kind=path frama-c /frama-c-21.1-Scandium
+ENV OPAM_SWITCH_PREFIX='/root/.opam/default'
+ENV CAML_LD_LIBRARY_PATH='/root/.opam/default/lib/stublibs'
+ENV CAML_LD_LIBRARY_PATH='/root/.opam/default/lib/ocaml/stublibs:/root/.opam/default/lib/ocaml'
+ENV CAML_LD_LIBRARY_PATH='/root/.opam/default/lib/stublibs':"$CAML_LD_LIBRARY_PATH"
+ENV OCAML_TOPLEVEL_PATH='/root/.opam/default/lib/toplevel'
+ENV MANPATH="$MANPATH":'/root/.opam/default/man'
+ENV PATH='/root/.opam/default/bin':"$PATH"
+COPY ./installs/frama-c/frama-c.mk /root/.opam/default/share/frama-c/analysis-scripts/frama-c.mk
+
+# since my tool assume this working directory
+WORKDIR /llvm-base/build

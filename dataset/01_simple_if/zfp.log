@@ -1,0 +1,16 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+current: storage/final-dataset/01_simple_if/
+number of value sets identified: 4
+number of opaque predicates: 2
+time it takes to obfuscate (seconds): 5.482382492999989
+time it takes to obfuscate (formatted): 0:00:05.482382
+Frama-C runtime (seconds): 0.8678301929999748
+Frama-C runtime (formatted): 0:00:00.867830
+value sets that didn't make it as opaque predicates, or unsat(0)
+value sets that didn't make it as value sets since it's only zero(2)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+values that are unsat: 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+values that are too simple: 
+'/tmp/zfp-0.7291004237122474/01_simple_if.c:7:val:{0}'
+'/tmp/zfp-0.7291004237122474/01_simple_if.c:13:file:{0}'
