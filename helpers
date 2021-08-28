@@ -16,8 +16,8 @@ killc ()
 # start analysis
 startc ()
 {
-  docker run -t -d -v $(pwd)/storage:/host-storage --name zfp-main zfp-main
-  docker run -t -d -v $(pwd)/storage:/host-storage --name zfp-clang zfp-clang
+  docker run -t -d -v $(pwd)/dataset:/host-storage --name zfp-main zfp-main
+  docker run -t -d -v $(pwd)/dataset:/host-storage --name zfp-clang zfp-clang
   MAIN_ID=$(docker ps -qf "name=^zfp-main$")
   CLANG_ID=$(docker ps -qf "name=^zfp-clang$")
 }

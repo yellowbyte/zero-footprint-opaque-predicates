@@ -42,16 +42,6 @@ User can specify the settings in a JSON file named "zfp.json" and place that fil
 
 User can also directly change the settings by updating the `configs` dictionary  at `src/utilities/__init__.py`
 
-## Files 
-
-#### scripts
-* `BinValueSetEval.py`: given an obfuscated binary, check if binary abstract interpretation (available in BinaryNinja) can identify our opaque predicates by evaluating variable's value set under the corresponding predicate
-* `identify_zfp.py`: print all the opaque predicates locations
-  * We purposely make our opaque predicates' obfuscation (i.e., injected non-executable code) deterministic so we can detect them for evaluation with other deobfuscation tools
-* `perform_eval.py`: given a file containing the correct opaque predicates locations (can be retrieved with identify\_zfp.py) and another file containing the opaque predicates locations identified by a deobfuscation tool, evaluate how well the deobfuscation tool performs
-* `run_all`: a host of bash functions to help perform evaluations/obfuscations on multiple binaries
-  * run this command to use: source scripts/run\_all
-
 ## Other Notes and Pitfalls
 
 * Due to dependency issues, we decide to split tools across two different docker containers. The newest version of Frama-C when we started (21.1) requires opam version >= 2 and opam version >= 2 is only available on Ubuntu 18 and above. However, we ran into problem when we needed clang 3.8 and clang 3.8 is not available on Ubuntu 18 and above. The reason we needed clang 3.8 is because our LLVM pass (LLVM pass are used to identify the locations to insert Frama-C macros) is written for LLVM 3.8. The central code that provides the coordination in our obfuscation pipeline is the file insert\_ops.py; it will spun up the necessary container to perform the obfuscation and also perform the necessary cleanup afterward. For more thoughts on this, check todos.md.
@@ -61,3 +51,5 @@ User can also directly change the settings by updating the `configs` dictionary 
   * Target C file cannot condense if statement or for loop to one line. This is because the value set identified by Frama-C will be for the code inside that one line if statement or for loop, but the corresponding synthesized opaque predicate will be outside of the one line if statement or for loop when inserted into the source code.
   * Target C file should avoid using unsigned variables. Our tool might synthesize an opaque predicate that compares an unsigned variable to -1 but common compiler (e.g., clang, gcc) will still use unsigned machine comparison (e.g., JAE) instead of signed machine comparison (e.g., JGE) since the variable type is unsigned. If this is the case, then the obfuscation or non-executable code can be executed.
   * In the target C file, any variable used in a for loop init needs to be declared outside the for loop. Since if Frama-C identifies the init variable as containing a value set at the end of a function, our tool might synthesize an opaque predicate for that init variable but that init variable is out-of-scope at end of function if not declared outside the for loop.
+
+__NOTE__: Current development with custom Frama-C plugin (see prettyvsa.ml) will remove dependency with multiple docker containers.

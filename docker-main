@@ -51,9 +51,9 @@ RUN apt-get -y install opam
 RUN mkdir /rosette-install
 WORKDIR /rosette-install
 # racket install script is too big to store in git
-RUN wget https://mirror.racket-lang.org/installers/7.8/racket-7.8-x86_64-linux.sh
-RUN chmod 755 racket-7.8-x86_64-linux.sh
-RUN echo "yes\n1\n" | sh racket-7.8-x86_64-linux.sh
+RUN wget https://download.racket-lang.org/installers/8.2/racket-8.2-x86_64-linux-cs.sh
+RUN chmod 755 racket-8.2-x86_64-linux-cs.sh
+RUN echo "yes\n1\n" | sh racket-8.2-x86_64-linux-cs.sh
 RUN raco setup
 RUN raco pkg install custom-load
 RUN raco pkg install rfc6455
@@ -82,6 +82,7 @@ RUN cmake --build . --target install
 # Version lock instead of installing newest version of Frama-C
 RUN eval $(opam env) && opam init --disable-sandboxing && opam install -y depext && opam depext frama-c && opam install -y --deps-only frama-c
 COPY ./installs/frama-c/frama-c-21.1-Scandium.tar.gz / 
+COPY ./installs/frama-c/prettyvsa.ml / 
 WORKDIR /
 RUN tar xf frama-c-21.1-Scandium.tar.gz
 RUN opam pin add -y --kind=path frama-c /frama-c-21.1-Scandium
