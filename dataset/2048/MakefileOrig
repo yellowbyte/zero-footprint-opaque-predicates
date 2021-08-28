@@ -1,2 +1,0 @@
-all: 
-	clang -m32 -o 2048.orig 2048.c

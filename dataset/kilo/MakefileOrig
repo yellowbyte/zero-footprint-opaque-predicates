@@ -1,2 +1,0 @@
-all:
-	clang -g -m32 -o kilo.orig kilo.c

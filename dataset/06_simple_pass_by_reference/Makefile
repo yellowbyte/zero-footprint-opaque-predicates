@@ -1,2 +1,0 @@
-all:
-	clang -m32 -o 06_simple_pass_by_reference 06_simple_pass_by_reference.c

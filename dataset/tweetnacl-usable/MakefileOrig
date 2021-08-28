@@ -1,2 +1,0 @@
-all:
-	clang -g -m32 -o main.orig main.c randombytes.c tweetnacl.c

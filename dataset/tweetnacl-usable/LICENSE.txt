@@ -1,2 +1,0 @@
-(This is not official from the author, but in Github he/she stated that
-tweetnacl-usable is public domain, just like TweetNaCl itself.)
