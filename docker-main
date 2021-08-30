@@ -44,9 +44,8 @@ RUN apt-get install -y build-essential && \
                        jq \
                        wget \
                        time \
-                       zlib1g-dev
-RUN apt-get upgrade
-RUN apt-get install -y opam
+                       zlib1g-dev \
+                       opam
 
 ### Install Rosette (Racket)
 RUN mkdir /rosette-install
