@@ -62,21 +62,6 @@ RUN raco pkg install rosette
 COPY ./installs/rosette/expr-gen.rkt /synthesis/
 COPY ./installs/rosette/get_synthesis.sh /synthesis/
 
-### Install LLVM 3.8.0
-RUN mkdir /llvm-base
-COPY ./installs/llvm/llvm-3.8.0.src.tar.gz /
-WORKDIR /
-RUN tar xf llvm-3.8.0.src.tar.gz
-RUN mv installs/llvm/llvm-3.8.0.src/* /llvm-base
-RUN rm -rf llvm-3.8.0.src
-WORKDIR /llvm-base/build
-RUN cmake /llvm-base \
-    -G "Unix Makefiles" -DLLVM_TARGETS_TO_BUILD="X86" \
-    -DLLVM_ENABLE_PROJECTS="clang;lld" \
-    -DCMAKE_BUILD_TYPE=MinSizeRel
-RUN cmake --build .
-RUN cmake --build . --target install
-
 ###  Install Frama-C
 RUN opam init --disable-sandboxing --shell-setup
 RUN eval $(opam env)
