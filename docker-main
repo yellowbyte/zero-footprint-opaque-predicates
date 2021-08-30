@@ -1,5 +1,7 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 MAINTAINER Yu-Jye Tung
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 ### Privilege for some installations
 USER root
@@ -21,6 +23,7 @@ RUN apt-get install -y build-essential && \
                        libgtksourceview2.0-dev \
                        libgtk-3-dev \
                        m4 \
+	               make \
                        cmake \
                        flex \
                        libboost-all-dev \
@@ -33,6 +36,7 @@ RUN apt-get install -y build-essential && \
                        llvm \
                        llvm-dev \
                        gcc-multilib \
+	               gcc \
                        libffi-dev \
                        libz-dev \
                        software-properties-common \
@@ -41,11 +45,8 @@ RUN apt-get install -y build-essential && \
                        wget \
                        time \
                        zlib1g-dev
-### To install OPAM 2 on Ubuntu Bionic
-RUN apt-get update
-RUN add-apt-repository ppa:avsm/ppa
-RUN apt-get update
-RUN apt-get -y install opam
+RUN apt-get upgrade
+RUN apt-get install -y opam
 
 ### Install Rosette (Racket)
 RUN mkdir /rosette-install
@@ -78,22 +79,13 @@ RUN cmake --build .
 RUN cmake --build . --target install
 
 ###  Install Frama-C
-#RUN eval $(opam env) && opam init --disable-sandboxing && opam install -y frama-c
-# Version lock instead of installing newest version of Frama-C
-RUN eval $(opam env) && opam init --disable-sandboxing && opam install -y depext && opam depext frama-c && opam install -y --deps-only frama-c
-COPY ./installs/frama-c/frama-c-21.1-Scandium.tar.gz / 
+RUN opam init --disable-sandboxing --shell-setup
+RUN eval $(opam env)
+RUN opam install -y depext
+RUN opam depext --install -y lablgtk3 lablgtk3-sourceview3
+RUN eval $(opam env)
+RUN opam depext --install -y frama-c
 COPY ./installs/frama-c/prettyvsa.ml / 
-WORKDIR /
-RUN tar xf frama-c-21.1-Scandium.tar.gz
-RUN opam pin add -y --kind=path frama-c /frama-c-21.1-Scandium
-ENV OPAM_SWITCH_PREFIX='/root/.opam/default'
-ENV CAML_LD_LIBRARY_PATH='/root/.opam/default/lib/stublibs'
-ENV CAML_LD_LIBRARY_PATH='/root/.opam/default/lib/ocaml/stublibs:/root/.opam/default/lib/ocaml'
-ENV CAML_LD_LIBRARY_PATH='/root/.opam/default/lib/stublibs':"$CAML_LD_LIBRARY_PATH"
-ENV OCAML_TOPLEVEL_PATH='/root/.opam/default/lib/toplevel'
-ENV MANPATH="$MANPATH":'/root/.opam/default/man'
-ENV PATH='/root/.opam/default/bin':"$PATH"
-COPY ./installs/frama-c/frama-c.mk /root/.opam/default/share/frama-c/analysis-scripts/frama-c.mk
 
 # since my tool assume this working directory
 WORKDIR /llvm-base/build
