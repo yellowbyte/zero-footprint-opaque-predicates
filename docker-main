@@ -64,11 +64,20 @@ COPY ./installs/rosette/get_synthesis.sh /synthesis/
 
 ###  Install Frama-C
 RUN opam init --disable-sandboxing --shell-setup
-RUN eval $(opam env)
-RUN opam install -y depext
-RUN opam depext --install -y lablgtk3 lablgtk3-sourceview3
-RUN eval $(opam env)
-RUN opam depext --install -y frama-c
+RUN eval $(opam env) && \ 
+    opam install -y depext && \
+    opam depext --install -y lablgtk3 lablgtk3-sourceview3
+RUN eval $(opam env) && \ 
+    opam depext --install -y frama-c
+# the ENVs are replacement for "eval $(opam env)"
+# eval $(opam env) doesn't work here since each RUN command runs a new shell in a new container: 
+# https://stackoverflow.com/questions/56253582/how-do-i-run-the-eval-envkey-source-command-in-docker-using-dockerfile
+ENV OPAM_SWITCH_PREFIX='/root/.opam/default'
+ENV CAML_LD_LIBRARY_PATH='/root/.opam/default/lib/stublibs:/usr/local/lib/ocaml/4.08.1/stublibs:/usr/lib/ocaml/stublibs'
+ENV OCAML_TOPLEVEL_PATH='/root/.opam/default/lib/toplevel'
+ENV PKG_CONFIG_PATH='/root/.opam/default/lib/pkgconfig'
+ENV MANPATH=':/root/.opam/default/man'
+ENV PATH='/root/.opam/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 COPY ./installs/frama-c/prettyvsa.ml / 
 
 # since my tool assume this working directory

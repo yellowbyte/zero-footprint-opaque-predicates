@@ -103,8 +103,8 @@ let pretty_local_and_global_vars kf fmt stmt =
   (* Handles global variables *)
   Globals.Vars.iter (fun vi ii -> 
     let s = Format.asprintf "%a" Printer.pp_location vi.vdecl in 
-    if (contains s "FRAMAC_SHARE") == false && (contains s ":0") == false then
-      (* Filter out internal Frama-C variables, which has paths that start with FRAMAC_SHARE or :0 *)
+    if (contains s "root/.opam/default/") == false && (contains s ":0") == false then
+      (* Filter out internal Frama-C variables, which has paths that start with root/.opam/default/ or :0 *)
       if Cil.isPointerType vi.vtype then
         (* Variable is a pointer. Print it as such so user knows *)
         let lval = (Mem (Cil.evar vi), NoOffset) in
@@ -149,9 +149,10 @@ let () =
       Globals.Functions.iter
         (fun kf ->
           let s = Format.asprintf "%a" Printer.pp_location (Kernel_function.get_location kf) in 
-          if (contains s "FRAMAC_SHARE") == false then
+          if (contains s "root/.opam/default/") == false then
             (* Filter functions that are not present in original source code *)
             let kf_vis = new stmt_val_visitor in
             let fundec = Kernel_function.get_definition kf in
             (* Kernel.log "kf = %s\n" (Kernel_function.get_name kf); *) (* current function *)
-            ignore (Visitor.visitFramacFunction (kf_vis kf) fundec);))
+            ignore (Visitor.visitFramacFunction (kf_vis kf) fundec);
+        ))

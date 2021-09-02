@@ -54,6 +54,13 @@ rmm ()
   rm -rf zfp-0.*
 }
 
+# restart docker
+# https://stackoverflow.com/questions/31365827/cannot-stop-or-restart-a-docker-container
+docker_restart ()
+{
+  sudo systemctl restart docker.socket docker.service
+}
+
 # detach from container terminal: Ctrl-P n Ctrl-Q
 # how to de-attach: https://stackoverflow.com/questions/19688314/how-do-you-attach-and-detach-from-dockers-process
 

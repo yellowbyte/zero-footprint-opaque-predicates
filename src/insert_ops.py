@@ -50,24 +50,20 @@ class ZFP:
         self.op_nums = 0
 
         # ~~~ main operations ~~~
-        # (1) Insert Macros
-        # Insert Frama-C macros into all C source files
-        self._iterate_c_files(self._macros_setup)
-
-        # (2) Perform Value Analysis 
+        # (1) Perform Value Analysis 
         # Run Frama-C to perform value analysis
         # Parse Frama-C's output to identify value-set
         self.value_sets = self._get_value_sets()
         # remove previously inserted macros as it is no longer needed
         self._iterate_c_files(remove_starting_from, args=(configs["framac_macro"],)) 
 
-        # (3) Perform Synthesis
+        # (2) Perform Synthesis
         # Pass value set to Rosette to perform synthesis
         self.opaque_expressions = self._get_opaque_expressions()
         # Create opaque predicates from synthesis result (i.e., create the if statement)
         self.opaque_predicates = self._get_opaque_predicates()
 
-        # (4) Perform Injection
+        # (3) Perform Injection
         # Perform opaque predicates injection
         self._perform_injection()
         # ~~~ main operations ~~~
