@@ -54,9 +54,16 @@ rmm ()
   rm -rf zfp-0.*
 }
 
+# stop and remove all running docker containers
+docker_clean ()
+{
+  docker stop $(docker ps -a -q)
+  docker rm $(docker ps -a -q)
+}
+
 # restart docker
 # https://stackoverflow.com/questions/31365827/cannot-stop-or-restart-a-docker-container
-docker_restart ()
+docker_new ()
 {
   sudo systemctl restart docker.socket docker.service
 }

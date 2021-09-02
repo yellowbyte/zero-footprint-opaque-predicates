@@ -234,6 +234,7 @@ def framac_output_split(framac_out):
     """
     First step in parsing Frama-C value analysis output
     """
+    # TODO
     macro_raw, func_raw = framac_out.split("[eva] ====== VALUES COMPUTED ======")
     func_raw, _ = func_raw.split("[eva:summary] ====== ANALYSIS SUMMARY ======")
     macro_raw = macro_raw.split("[eva] ")

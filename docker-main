@@ -80,5 +80,14 @@ ENV MANPATH=':/root/.opam/default/man'
 ENV PATH='/root/.opam/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 COPY ./installs/frama-c/prettyvsa.ml / 
 
+### Install Python 3.10 (to use pattern matching)
+RUN apt update
+RUN apt install software-properties-common
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt -y install python3.10
+
 # since my tool assume this working directory
 WORKDIR /llvm-base/build
+
+
+

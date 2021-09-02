@@ -54,8 +54,6 @@ class ZFP:
         # Run Frama-C to perform value analysis
         # Parse Frama-C's output to identify value-set
         self.value_sets = self._get_value_sets()
-        # remove previously inserted macros as it is no longer needed
-        self._iterate_c_files(remove_starting_from, args=(configs["framac_macro"],)) 
 
         # (2) Perform Synthesis
         # Pass value set to Rosette to perform synthesis
@@ -208,6 +206,7 @@ class ZFP:
         """
         Parse, beautify, and save Frama-C's value analysis result as JSON
         """
+        # TODO
         func_raw, macro_raw = framac_output_split(self._run_framac())
         value_sets = defaultdict(set)
 
@@ -252,7 +251,8 @@ class ZFP:
         """
         Perform Value Analysis with Frama-C
         """
-        cmd = "make -C "+self.wdir
+        # TODO
+        cmd = "make -C "+self.wdir  # call Frama-C (i.e., make GNUmakefile)
         time_before = perf_counter()
         framac_raw_output = shell_exec(self.main_exec+cmd)
         time_after = perf_counter()
