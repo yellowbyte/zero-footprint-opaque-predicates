@@ -79,6 +79,7 @@ ENV PKG_CONFIG_PATH='/root/.opam/default/lib/pkgconfig'
 ENV MANPATH=':/root/.opam/default/man'
 ENV PATH='/root/.opam/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 COPY ./installs/frama-c/prettyvsa.ml / 
+COPY ./src /src
 
 ### Install Python 3.10 (to use pattern matching)
 RUN apt update

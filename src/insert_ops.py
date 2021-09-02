@@ -88,32 +88,6 @@ class ZFP:
                 # Call method
                 method(filepath, *args)
 
-    def _macros_setup(self, filepath):
-        """
-        Everything up to inserting Frama-C macros
-        """
-        # remove comment 
-        # process hash define 
-        # -P: do not insert metadata comment indicating original src lines
-        # -fpreprocessed: indicates that the translation unit was already preprocessed and only removes comments. 
-        shell2file(filepath, "gcc -fpreprocessed -dD -E -P "+filepath)
-        # Our previous gcc preprocess command to remove comment insert metadata on original src lines 
-        # This makes clang output bitcode that respect original src lines
-        src_code = get_file_content(filepath, return_type="list")
-        # Compile each source code file with clang to get bitcode
-        self._run_clang(filepath)  # compile src code file to bitcode file
-        # Run llvm pass to identify locations of variables and functions
-        # NOTE: LLVM pass preprocess .c includes (ex: #include<x.c>). However, src_code will contain code without the 
-        #       preprocessed code.
-        variables, funcs_end = self._run_llvm(filepath, src_code)
-        for func, line_info in funcs_end.items():
-            starting_line, ending_line = line_info
-            # Information on where the func ends (line) 
-            # and the file that it belongs to (filepath)
-            self.funcs_info[func] = (starting_line, ending_line, filepath, "\n".join(src_code[int(starting_line)-1:int(ending_line)]))
-        # Insert Frama-C macros in variables' locations identified by LLVM Pass
-        insert_framac_macros(filepath, src_code, variables)
-
     def _perform_injection(self):
         """
         Insert synthesized opaque predicates (construction+obfuscation) back to source

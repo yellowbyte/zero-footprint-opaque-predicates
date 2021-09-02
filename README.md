@@ -9,7 +9,7 @@ _Current tool implementation has some pitfalls (check <b>Other Notes and Pitfall
 ## Getting Started
 
 #### Requirements
-* Python 3.7 and above
+* Python 3.10 (for pattern matching)
 * Docker 
 
 #### Installation (assumed in project root directory)
