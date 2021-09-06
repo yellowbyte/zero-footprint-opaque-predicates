@@ -71,21 +71,6 @@ class ZFP:
         """
         return os.path.join(self.wdir, "vsa.json")
 
-    def _iterate_c_files(self, method, args=()):
-        """
-        Call `method` on each C file found
-        """
-        for root, subdirs, files in os.walk(self.wdir):
-            for filename in files:
-                if not filename.endswith(".c"):
-                    continue
-                if filename in ZFP.PARAMS.ignored_files:
-                    continue
-                # Obfuscate each c source file
-                filepath = os.path.join(root, filename)
-                # Call method
-                method(filepath, *args)
-
     def _perform_injection(self):
         """
         Insert synthesized opaque predicates (construction+obfuscation) back to source
@@ -141,63 +126,13 @@ class ZFP:
 
         return opaque_predicates
 
-    def _macro_raw_iterator(self, macro_raw):
-        """
-        Get Frama-C value analysis result from the inserted macros
-        """
-        for l in macro_raw:
-            # First level filter
-            if any([v in l for v in ZFP.PARAMS.framac_vars]):
-                # Ignores Frama-C specific variables. They do not exist in original source
-                continue
-            if any([l.lstrip().startswith(func_name+"_") for func_name in self.funcs_info.keys()]):
-                # Frama-C is a bit weird in that it will identify value set for a subroutine's local variables
-                # in the subroutine's parent function. Value set identified this way have their variable name
-                # starts with the subroutine's name and we ignore them since the variable is out of scope
-                continue
-            yield l
-
-    def _func_raw_iterator(self, func_raw):
-        """
-        Get Frama-C value analysis' default result
-        """
-        func_start = "Values at end of function "
-        for l in func_raw:
-            struct_name = str()
-            # Each line is on a function
-            if not l.startswith(func_start):
-                continue    
-            cur_func = l[len(func_start):l.index(":")]
-            if cur_func in ZFP.PARAMS.ignored_functions:
-                continue
-            if cur_func not in self.funcs_info.keys():
-                continue
-            yield l
-
     def _get_value_sets(self):
         """
         Parse, beautify, and save Frama-C's value analysis result as JSON
         """
-        # TODO
-        func_raw, macro_raw = framac_output_split(self._run_framac())
-        value_sets = defaultdict(set)
+        value_sets = framac_output_split(self._run_framac(), ZFP.PARAMS)
 
-        # Get value set for macros result (into in-memory data structure)
-        blacklist = list()  # vairable whose value set we no longer want
-        for l in self._macro_raw_iterator(macro_raw):
-            # macro_info = filepath, loc, var_name, potential_value_set_info
-            macro_info = get_macro_info(self.wdir, l)
-            if not macro_info:
-                continue
-            get_macro_value_sets(value_sets, macro_info, blacklist, ZFP.PARAMS)
-
-        # Get value set for end of function result (into in-memory data structure)
-        func_start = "Values at end of function "
-        for l in self._func_raw_iterator(func_raw):
-            cur_func = l[len(func_start):l.index(":")]
-            func_vars = l[l.index(":"):].split("\n")
-            get_func_value_sets(value_sets, cur_func, func_vars, self.funcs_info, ZFP.PARAMS)
-
+        # TODO: Update rest of function (outdated code)
         # Save value_sets result (dictionary) as json
         # object of type set is not JSON serializable 
         # value_sets contains loc where loc is function name or where loc is line number
@@ -223,7 +158,6 @@ class ZFP:
         """
         Perform Value Analysis with Frama-C
         """
-        # TODO
         cmd = "make -C "+self.wdir  # call Frama-C (i.e., make GNUmakefile)
         time_before = perf_counter()
         framac_raw_output = shell_exec(cmd)
