@@ -1,5 +1,3 @@
-(* Based off of: https://stackoverflow.com/questions/36132777/frama-c-plugin-development-getting-result-of-value-analysis *)
-
 open Cil_types
 
 
@@ -146,7 +144,7 @@ class stmt_val_visitor kf =
 (* EX: frama-c -eva -eva-slevel 100 -eva-warn-key alarm=inactive -eva-auto-loop-unroll 300 -load-script /prettyvsa.ml 2048.c *)
 let () =
   Db.Main.extend (fun () ->
-      Format.printf "START PRETTY VSA @.";
+      Format.printf "START PRETTY VSA (ZFP) @.";
       !Db.Value.compute ();
       Globals.Functions.iter
         (fun kf ->
@@ -155,6 +153,14 @@ let () =
             (* Filter functions that are not present in original source code *)
             let kf_vis = new stmt_val_visitor in
             let fundec = Kernel_function.get_definition kf in
-            (* Kernel.log "kf = %s\n" (Kernel_function.get_name kf); *) (* current function *)
             ignore (Visitor.visitFramacFunction (kf_vis kf) fundec);
+        );
+      print_string "FUNCTIONS IN SOURCE (ZFP)\n"; 
+      Globals.Functions.iter
+        (fun kf ->
+          let s = Format.asprintf "%a" Printer.pp_location (Kernel_function.get_location kf) in 
+          if (contains s "root/.opam/default/") == false && (contains s "FRAMAC_SHARE") == false then
+            (* Filter functions that are not present in original source code *)
+            let funcs_in_src = Format.asprintf "%s\n" (Kernel_function.get_name kf) in 
+            Format.printf "%s" funcs_in_src;
         ))

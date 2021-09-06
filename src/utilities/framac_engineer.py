@@ -22,7 +22,9 @@ def framac_output_split(framac_out, params):
     """
     pretty_value_sets = defaultdict(set)    
 
-    _, prettyvsa_output = framac_out.split("START PRETTY VSA")
+    _, prettyvsa_curfuncs_output = framac_out.split("START PRETTY VSA (ZFP)")
+    prettyvsa_output, curfuncs_output = prettyvsa_curfuncs_output.split("FUNCTIONS IN SOURCE (ZFP)")
+    curfuncs = curfuncs_output.split()
     # last item is not part of the result
     # EX: "\nmake: Leaving directory '/tmp/zfp-0.16860656542979857'"
     prettyvsa_output = prettyvsa_output.split("----------")[:-1] 
@@ -40,16 +42,29 @@ def framac_output_split(framac_out, params):
             continue
 
         instr, loc = extract_metadata(metadata)        
-        print("CURRENT INSTRUCTION:", instr)
 
         # parse content of value_sets
         for vs in value_sets:
-            values = list()
             var_name, _set = vs.split(":")
+            is_bool = False
 
             # only want value sets of variable that is used in current instruction
             if var_name not in instr:
                 continue
+            if var_name == "__retres":
+                # return value statement
+                continue
+            if "tmp_" in var_name:
+                # Frama-C internal variable to keep track of intermediate values
+                # Variable does not exist in original source. Unless developer 
+                # names the variable to start with "tmp_", in that case cannot
+                # differentiate so ignore to be safe
+                # EX: return value from rand()
+                continue
+            if any([func for func in curfuncs if var_name.startswith(func+"_")]):
+                # Boolean variable will be outputted by Frama-C with its function name prepended
+                # Boolean variable and the function name is separated by a '_'
+                is_bool = True
 
             match _set.split():
                 case ["{{", "}}"]:
@@ -72,25 +87,39 @@ def framac_output_split(framac_out, params):
                         continue
                     if "NaN" in to_extract:
                         continue
+
+                    # Frama-C represents Boolean variable differently. However, when inserted back
+                    # into source, we need the original variable name. So here we reconstruct the 
+                    # original variable name
+                    if is_bool:
+                        underscore_index = var_name.find("_")
+                        var_name = var_name[underscore_index+1:]
                     
                     match list(to_extract):
                         case ["{", *_, "}"]:  # EX: {1; 2; 3}
-                            pretty_value_sets[loc+":"+var_name].update(eval(to_extract.replace(";", ",")))
-                        case ["[", *_range, "]"]:
+                            pretty_value_sets[loc+":"+var_name].update(
+                                eval(to_extract.replace(";", ","))
+                            )
+                        case ["[", *_range, "]"]:  # EX: [1..256]
                             _range = "".join(_range)
                             start, end = _range.split("..")
                             if int(end)-int(start) > params.value_set_limit:
                                 continue
-                            pretty_value_sets[loc+":"+var_name].update(list(range(int(start), int(end)+1)))
-                        case ["[", *_range, "]", ",", remainder, "%", divisor]:
+                            pretty_value_sets[loc+":"+var_name].update(
+                                list(range(int(start), int(end)+1))
+                            )
+                        case ["[", *_range, "]", ",", remainder, "%", divisor]:  # EX: [1..245],0%2
                             _range = "".join(_range)
                             start, end = _range.split("..")
                             if int(end)-int(start) > params.value_set_limit:
                                 continue
-                            pretty_value_sets[loc+":"+var_name].update([i for i in list(range(int(start), int(end)+1)) if i%int(divisor)==int(remainder)])
+                            pretty_value_sets[loc+":"+var_name].update(
+                                [i for i in list(range(int(start), int(end)+1)) if i%int(divisor)==int(remainder)]
+                            )
                         case _:
-                            print("NOT HANDLED: CONTACT DEVELOPER")
+                            raise SystemExit("Error in parsing Frama-C script's output")
                 case _:
-                    print("NOT HANDLED: CONTACT DEVELOPER")
+                    raise SystemExit("Error in parsing Frama-C script's output")
 
+    breakpoint()
     return pretty_value_sets

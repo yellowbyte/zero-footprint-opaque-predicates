@@ -81,7 +81,7 @@ ENV PATH='/root/.opam/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/
 COPY ./installs/frama-c/prettyvsa.ml / 
 COPY ./src /src
 
-### Install Python 3.10 (to use pattern matching)
+### Install Python 3.10
 RUN apt update
 RUN apt install software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa

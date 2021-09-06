@@ -138,15 +138,7 @@ class ZFP:
         # value_sets contains loc where loc is function name or where loc is line number
         # the JSON file is for Rosette
         vsa_serializable = dict()
-        value_sets_no_empty = {k:v for k,v in value_sets.items() if v}
-        for key, val in value_sets_no_empty.items():
-            # avoid value set of just 0 since Frama-C will identify a pointer as containing only 0
-            # and the way I identify variable for Frama-C macro does not recognize pointer variable
-            # ++ 
-            # Frama-C will mis-identify complex struct as int. In those cases, the identified value is just a 0
-            if len(list(val))==1 and list(val)[0] == 0:
-               self.failed_vsa.append(str(key)+":"+str(val))
-               continue
+        for key, val in value_sets.items():
             vsa_serializable[key] = list(val)  # val is set
         with open(self.filepath_json, "w") as f:
             json.dump(vsa_serializable, f)
@@ -163,6 +155,8 @@ class ZFP:
         framac_raw_output = shell_exec(cmd)
         time_after = perf_counter()
         self.framac_runtime = time_after-time_before
+        # clean up residue
+        framac_raw_output.split("make: Leaving directory", 1)[0]
         return framac_raw_output
 
     def _run_llvm(self, filepath, src_code):

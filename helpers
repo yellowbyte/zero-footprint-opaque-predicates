@@ -19,12 +19,6 @@ startc ()
   MAIN_ID=$(docker ps -qf "name=^zfp-main$")
 }
 
-# stop analysis
-stopc ()
-{
-  docker rm -f $MAIN_ID
-}
-
 # attach to container terminal
 attachc ()
 {
@@ -52,7 +46,7 @@ docker_clean ()
 
 # restart docker
 # https://stackoverflow.com/questions/31365827/cannot-stop-or-restart-a-docker-container
-docker_new ()
+docker_fresh ()
 {
   sudo systemctl restart docker.socket docker.service
 }
