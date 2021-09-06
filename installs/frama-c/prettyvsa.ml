@@ -87,6 +87,7 @@ let pretty_vi fmt stmt vi =
 let pretty_local_and_global_vars kf fmt stmt =
   (* Handles local variables *)
   let locals = Kernel_function.get_locals kf in
+  print_endline "END_OF_METADATA"; 
   print_endline "["; 
   List.iter (fun vi -> 
     if Cil.isPointerType vi.vtype then
@@ -103,7 +104,7 @@ let pretty_local_and_global_vars kf fmt stmt =
   (* Handles global variables *)
   Globals.Vars.iter (fun vi ii -> 
     let s = Format.asprintf "%a" Printer.pp_location vi.vdecl in 
-    if (contains s "root/.opam/default/") == false && (contains s ":0") == false then
+    if (contains s "root/.opam/default/") == false && (contains s "FRAMAC_SHARE") == false then
       (* Filter out internal Frama-C variables, which has paths that start with root/.opam/default/ or :0 *)
       if Cil.isPointerType vi.vtype then
         (* Variable is a pointer. Print it as such so user knows *)
@@ -142,6 +143,7 @@ class stmt_val_visitor kf =
 
 
 (* Start *)
+(* EX: frama-c -eva -eva-slevel 100 -eva-warn-key alarm=inactive -eva-auto-loop-unroll 300 -load-script /prettyvsa.ml 2048.c *)
 let () =
   Db.Main.extend (fun () ->
       Format.printf "START PRETTY VSA @.";
@@ -149,7 +151,7 @@ let () =
       Globals.Functions.iter
         (fun kf ->
           let s = Format.asprintf "%a" Printer.pp_location (Kernel_function.get_location kf) in 
-          if (contains s "root/.opam/default/") == false then
+          if (contains s "root/.opam/default/") == false && (contains s "FRAMAC_SHARE") == false then
             (* Filter functions that are not present in original source code *)
             let kf_vis = new stmt_val_visitor in
             let fundec = Kernel_function.get_definition kf in

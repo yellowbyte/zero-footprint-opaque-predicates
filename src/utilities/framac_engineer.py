@@ -230,16 +230,45 @@ def get_macro_value_sets(value_sets, macro_info, blacklist, params):
         index = str()
 
 
+def extract_metadata(metadata):
+    """
+    """
+    loc_index = metadata.find("current line: ")
+    instr = metadata[len("current instruction: "):loc_index]
+    loc = metadata[loc_index+len("current line: "):]
+    return instr, loc    
+
+
 def framac_output_split(framac_out):
     """
     First step in parsing Frama-C value analysis output
     """
-    # TODO
-    macro_raw, func_raw = framac_out.split("[eva] ====== VALUES COMPUTED ======")
-    func_raw, _ = func_raw.split("[eva:summary] ====== ANALYSIS SUMMARY ======")
-    macro_raw = macro_raw.split("[eva] ")
-    func_raw = func_raw.split("[eva:final-states] ")  # each element is a string on a function result
-    return func_raw, macro_raw
+    _, prettyvsa_output = framac_out.split("START PRETTY VSA")
+    # last item is not part of the result
+    # EX: "\nmake: Leaving directory '/tmp/zfp-0.16860656542979857'"
+    prettyvsa_output = prettyvsa_output.split("----------")[:-1] 
+
+    for value_sets_at_loc in prettyvsa_output:
+        value_sets_nonewline = value_sets_at_loc.replace("\n", "")
+        end_of_metadata_index = value_sets_nonewline.find("END_OF_METADATA")
+        # metadata contains instruction, filename, and line number
+        metadata = value_sets_nonewline[:end_of_metadata_index]
+        # value set from Frama-C script print value set to stdout in the format of a Python list
+        value_sets = eval(value_sets_nonewline[end_of_metadata_index+len("END_OF_METADATA"):])
+
+        # list is empty (no value set)
+        if not value_sets:
+            continue
+
+        instr, loc = extract_metadata(metadata)        
+        filepath, line_number = loc.split(":")
+
+        # parse content of value_sets
+        for vs in value_sets:
+            var_name, _set = vs.split(":")
+            # TODO: use pattern matching to extract list of values from _set
+
+    return prettyvsa_output
 
 
 def insert_framac_macros(filepath, src_code, variables):

@@ -37,10 +37,8 @@ class ZFP:
                            configs["ignored_functions"], 
                            configs["value_set_limit"])
 
-    def __init__(self, wdir, main_id, clang_id):
+    def __init__(self, wdir):
         self.wdir = wdir  # working directory in /tmp folder
-        self.main_exec = "docker exec -it "+main_id+" "
-        self.clang_exec = "docker exec -it "+clang_id+" "
         self.funcs_info = dict()
         # Useful statistic
         self.failed_vsa2op = list()  # numbers of unsat 
@@ -107,7 +105,7 @@ class ZFP:
         """
         # Run Rosette
         cmd = "/synthesis/get_synthesis.sh "+self.filepath_json
-        opaque_expressions = shell_exec(self.main_exec+cmd).rstrip("\r").split("\r\n")
+        opaque_expressions = shell_exec(cmd).rstrip("\r").split("\r\n")
         return opaque_expressions
 
     def _get_opaque_predicates(self):
@@ -228,19 +226,10 @@ class ZFP:
         # TODO
         cmd = "make -C "+self.wdir  # call Frama-C (i.e., make GNUmakefile)
         time_before = perf_counter()
-        framac_raw_output = shell_exec(self.main_exec+cmd)
+        framac_raw_output = shell_exec(cmd)
         time_after = perf_counter()
         self.framac_runtime = time_after-time_before
         return framac_raw_output
-
-    def _run_clang(self, filepath):
-        """
-        Get LLVM bitcode
-        """
-        filepath_bc = get_filepath_ext(filepath, "bc")
-        # cmd: clang -O0 -g -emit-llvm [name].c -c -o [name].bc 
-        cmd = "clang -O0 -g -emit-llvm "+filepath+" -c -o "+filepath_bc
-        shell_exec(self.clang_exec+cmd)
 
     def _run_llvm(self, filepath, src_code):
         """
@@ -253,37 +242,32 @@ class ZFP:
         # cmd: opt -load lib/LLVMFindVars.so -findvars [name].bc
         # layout: line number, variable name, func name
         cmd = "opt -load lib/LLVMFindVars.so -findvars "+filepath_bc
-        llvm_vars_output = shell_exec(self.main_exec+cmd)
+        llvm_vars_output = shell_exec(cmd)
         # layout: func name, ending line, starting line
         cmd = "opt -load lib/LLVMFuncsEnd.so -funcsend "+filepath_bc
-        llvm_funcs_output = shell_exec(self.main_exec+cmd)
+        llvm_funcs_output = shell_exec(cmd)
 
         variables = extract_findvars(llvm_vars_output)
         funcs_possible_end = extract_funcsend(llvm_funcs_output)
         return filter_nonexistent_vars(src_code, variables), get_funcs_end(src_code, funcs_possible_end)
 
 
-def main(wdir, host_src_dir, main_id, clang_id):
+def main(wdir, host_src_dir):
     """
     Main
     """
     try: 
         timer_start = perf_counter()
-        obfuscated = ZFP(wdir, main_id, clang_id)    
+        obfuscated = ZFP(wdir)    
         timer_stop = perf_counter()
     except:
-        # Stop Docker
-        # If not run this, permission error with rmtree
-        shell_exec("docker exec -it "+main_id+" make clean -C "+wdir)  
-        shell_exec("docker rm -f "+main_id)
-        shell_exec("docker rm -f "+clang_id)
         # Remove tmp working dir
         if configs["delete_metadata"]:
             shutil.rmtree(wdir)
         sys.exit(str(traceback.format_exc()))
 
     # Compile the obfuscated source code
-    shell_exec("docker exec -it "+clang_id+" make -C "+wdir+" -f Makefile")
+    shell_exec(" make -C "+wdir+" -f Makefile")
     new_files = [f for f in filecmp.dircmp(host_src_dir, wdir).right_only 
               if not f.endswith(".json") and not f.endswith(".bc") and not \
               f.endswith(".c") and not f.endswith(".eva") and not f.endswith(".parse")]
@@ -332,24 +316,8 @@ if __name__ == "__main__":
     logger.addHandler(fh)
     logger.addHandler(sh)
 
-    # Start Docker
-    shell_exec("docker run -t -d -v "+wdir+":"+wdir+" --name zfp-main zfp-main")
-    shell_exec("docker run -t -d -v "+wdir+":"+wdir+" --name zfp-clang zfp-clang")
-                
-    # Get Docker containers' info
-    main_id = shell_exec("docker ps -qf name=^zfp-main$")
-    clang_id = shell_exec("docker ps -qf name=^zfp-clang$")
-
     # Main
-    main(wdir, host_src_dir, main_id, clang_id)
-
-    # Stop Docker
-    # If not run this, permission error with rmtree
-    # due to files created by Frama-C
-    shell_exec("docker exec -it "+main_id+" make clean -C "+wdir)  
-                                                                   
-    shell_exec("docker rm -f "+main_id)
-    shell_exec("docker rm -f "+clang_id)
+    main(wdir, host_src_dir)
 
     # Remove tmp working dir
     if configs["delete_metadata"]:

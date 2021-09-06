@@ -15,7 +15,7 @@ killc ()
 # start analysis
 startc ()
 {
-  docker run -t -d -v $(pwd)/dataset:/host-storage --name zfp-main zfp-main
+  docker run -t -d -v $(pwd)/dataset:/host-storage -v $(pwd)/src:/src --name zfp-main zfp-main
   MAIN_ID=$(docker ps -qf "name=^zfp-main$")
 }
 
