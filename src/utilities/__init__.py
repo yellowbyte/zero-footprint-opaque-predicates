@@ -18,7 +18,7 @@ from pathlib import Path
 configs = {
     "metadata_dir": "/tmp",
 
-    "delete_metadata": True,
+    "delete_metadata": False,
 
     ### Obfuscation for the inserted opaque predicates 
     # We purposely make it deterministic so we can detect our opaque predicates for evaluation with other deobfuscation tools.

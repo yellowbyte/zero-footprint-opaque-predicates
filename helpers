@@ -3,7 +3,6 @@
 # Build docker images
 buildc ()
 {
-  docker build . --tag zfp-clang -f docker-clang
   docker build . --tag zfp-main -f docker-main
 }
 
@@ -16,30 +15,9 @@ killc ()
 # start analysis
 startc ()
 {
-  docker run -t -d -v $(pwd)/dataset:/host-storage --name zfp-main zfp-main
-  docker run -t -d -v $(pwd)/dataset:/host-storage --name zfp-clang zfp-clang
+  docker run -t -d -v $(pwd)/dataset:/dataset -v $(pwd)/src:/src --name zfp-main zfp-main
   MAIN_ID=$(docker ps -qf "name=^zfp-main$")
-  CLANG_ID=$(docker ps -qf "name=^zfp-clang$")
-}
-
-# stop analysis
-stopc ()
-{
-  docker rm -f $MAIN_ID
-  docker rm -f $CLANG_ID
-#  docker volume rm zfp-data
-  $rmc
-}
-
-# attach to container terminal
-attachc ()
-{
-  if [[ "$1" = "main" ]] 
-  then
-    docker exec -it $MAIN_ID /bin/bash  
-  else 
-    docker exec -it $CLANG_ID /bin/bash  
-  fi
+  docker exec -it $MAIN_ID /bin/bash  
 }
 
 # tar the llvm folders under install since we untar it in docker-main
@@ -52,6 +30,20 @@ tar_llvm ()
 rmm ()
 {
   rm -rf zfp-0.*
+}
+
+# stop and remove all running docker containers
+docker_clean ()
+{
+  docker stop $(docker ps -a -q)
+  docker rm $(docker ps -a -q)
+}
+
+# restart docker
+# https://stackoverflow.com/questions/31365827/cannot-stop-or-restart-a-docker-container
+docker_fresh ()
+{
+  sudo systemctl restart docker.socket docker.service
 }
 
 # detach from container terminal: Ctrl-P n Ctrl-Q
