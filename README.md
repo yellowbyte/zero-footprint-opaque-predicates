@@ -13,7 +13,7 @@ _Current tool implementation has some pitfalls (check <b>Other Notes and Pitfall
 
 #### Installation (assumed in project root directory)
 1. source helpers
-2. buildc (will build a Docker that contains everything you needed to run this tool)
+2. buildc (will build a Docker image that contains everything you needed to run this tool)
 
 #### To Run (assumed in project root directory)
 * startc (assumed you ran `source helpers`. This command will drop you inside the Docker container)

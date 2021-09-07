@@ -1,1 +1,2 @@
 1. Experiments with other source-level abstract interpretation tools (e.g., [Apron](https://github.com/antoinemine/apron), [MOPSA](https://mopsa.lip6.fr), [clam](https://github.com/seahorn/clam)) and combine their outputs with Frama-C's value analysis output. 
+2. Give user option to choose from various kinds of opaque predicates' obfuscation (e.g., junk bytes, random branch)

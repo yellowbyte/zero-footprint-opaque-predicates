@@ -16,6 +16,12 @@ def extract_metadata(metadata):
     return instr, loc    
 
 
+def is_oneliner(instr):
+    """
+    """
+    # TODO
+    return 
+
 def framac_output_split(framac_out, params):
     """
     First step in parsing Frama-C value analysis output
@@ -37,11 +43,17 @@ def framac_output_split(framac_out, params):
         # value set from Frama-C script print value set to stdout in the format of a Python list
         value_sets = eval(value_sets_nonewline[end_of_metadata_index+len("END_OF_METADATA"):])
 
-        # list is empty (no value set)
+        # list is empty (no value sets)
         if not value_sets:
             continue
 
         instr, loc = extract_metadata(metadata)        
+
+# TODO
+#        # current instruction is a oneliner 
+#        # Oneliner (e.g., one-line if statement, one-line for-loop) will mess up our tool
+#        if is_oneliner(instr):
+#            continue
 
         # parse content of value_sets
         for vs in value_sets:
@@ -49,6 +61,7 @@ def framac_output_split(framac_out, params):
             is_bool = False
 
             # only want value sets of variable that is used in current instruction
+            # TODO: better way to detect if var_name is in current instruction
             if var_name not in instr:
                 continue
             if var_name == "__retres":

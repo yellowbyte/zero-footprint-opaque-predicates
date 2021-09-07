@@ -13,9 +13,19 @@ killc ()
 }
 
 # start analysis
-startc ()
+# testing
+startct ()
 {
   docker run -t -d -v $(pwd)/dataset:/dataset -v $(pwd)/src:/src --name zfp-container zfp-container
+  MAIN_ID=$(docker ps -qf "name=^zfp-container$")
+  docker exec -it $MAIN_ID /bin/bash  
+}
+
+# start analysis
+# production
+startc ()
+{
+  docker run -t -d -v $(pwd)/dataset:/dataset --name zfp-container zfp-container
   MAIN_ID=$(docker ps -qf "name=^zfp-container$")
   docker exec -it $MAIN_ID /bin/bash  
 }
