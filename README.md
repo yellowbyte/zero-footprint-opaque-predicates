@@ -1,6 +1,6 @@
 ## Overview
 
-[Zero Footprint Opaque Predicates](https://rdcu.be/cpnNf) obfuscate single-file C source code with opaque predicates that syntactically and semantically resemble real predicates in order to prevent heuristic attacks (e.g., pattern matching) while maintaining resilience against automated attacks. Opaque predicates have a reputation as a low-hanging fruit because it is easy to deobfuscate once detected (unlike VM obfuscation). However, opaque predicates can be very powerful when undetected because their obfuscation have the flexiblity to be not just any instruction sequence (i.e., code bloat) but also junk bytes that can further cause anti-disassembly (i.e., disassembly desynchronization).
+[Zero Footprint Opaque Predicates](https://rdcu.be/cpnNf) obfuscate single-file C source code with opaque predicates that syntactically and semantically resemble real predicates in order to prevent heuristic attacks (e.g., pattern matching) while maintaining resilience against automated attacks. Opaque predicates can be very powerful when undetected because their obfuscation have the flexiblity to be not just any instruction sequence (i.e., code bloat) but also junk bytes that can further cause anti-disassembly (i.e., disassembly desynchronization).
 
 Our inserted opaque predicates' obfuscation is a deterministic and impossible instruction sequence. This is to allow us to detect our opaque predicates so we can evaluate them with deobfuscation tools. In practice, the obfuscation should not always be the same sequence (or else it is easily detected from the obfuscation). 
 
@@ -9,7 +9,6 @@ _Current tool implementation has some pitfalls (check <b>Other Notes and Pitfall
 ## Getting Started
 
 #### Requirements
-* Python 3.10
 * Docker 
 
 #### Installation (assumed in project root directory)
