@@ -17,7 +17,7 @@ _Current tool implementation has some pitfalls (check <b>Other Notes and Pitfall
 2. buildc
 
 #### To Run (assumed in project root directory)
-* startc (assumed you ran `source helpers`)
+* startc (assumed you ran `source helpers`. This command will drop you inside the Docker container)
 * python3.10 src/insert\_ops.py [filepath to the folder containing target source code]
   * make sure the folder containing target source code has the following additional files: 
     * `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. 
@@ -46,5 +46,4 @@ User can also directly change the settings by updating the `configs` dictionary 
 
 * Cannot obfuscate code that contains recursive calls. This is a limitation of one of our dependencies, Frama-C
   * stated in [Frama-C's website under the "Technical Notes" section](https://www.frama-c.com/fc-plugins/eva.html).
-* NOTE: the following restrictions are due to our approach of parsing Frama-C's output. A custom Frama-C plugin will avoid them (check todos.md).
-  * Target C file cannot condense if statement or for loop to one line. This is because the value set identified by Frama-C will be for the code inside that one line if statement or for loop, but the corresponding synthesized opaque predicate will be outside of the one line if statement or for loop when inserted into the source code.
+* Target C file cannot condense if statement or for loop to one line. This is because the value set identified by Frama-C will be for the code inside that one line if statement or for loop, but the corresponding synthesized opaque predicate will be outside of the one line if statement or for loop when inserted into the source code.
