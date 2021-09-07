@@ -88,7 +88,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt -y install python3.10
 
 # since my tool assume this working directory
-WORKDIR /llvm-base/build
+WORKDIR /
 
 
 

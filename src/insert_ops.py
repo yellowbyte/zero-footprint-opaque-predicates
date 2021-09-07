@@ -123,7 +123,7 @@ class ZFP:
             elif opaqueness == "f":
                 content[loc].append("if("+var+" "+comparator+" "+constant+"){"+ZFP.PARAMS.obfuscation.format(index)+"}")
             index += 1
-
+        breakpoint()
         return opaque_predicates
 
     def _get_value_sets(self):
@@ -132,19 +132,13 @@ class ZFP:
         """
         value_sets = framac_output_split(self._run_framac(), ZFP.PARAMS)
 
-        # TODO: Update rest of function (outdated code)
         # Save value_sets result (dictionary) as json
         # object of type set is not JSON serializable 
-        # value_sets contains loc where loc is function name or where loc is line number
         # the JSON file is for Rosette
-        vsa_serializable = dict()
-        for key, val in value_sets.items():
-            vsa_serializable[key] = list(val)  # val is set
+        value_sets = {k:list(v) for k,v in value_sets.items()}
         with open(self.filepath_json, "w") as f:
-            json.dump(vsa_serializable, f)
-        # The returned value_sets is not used anywhere else 
-        # but we exposed it to users for debugging purpose
-        return value_sets_no_empty 
+            json.dump(value_sets, f)
+        return value_sets
 
     def _run_framac(self):
         """

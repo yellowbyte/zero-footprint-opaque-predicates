@@ -121,5 +121,4 @@ def framac_output_split(framac_out, params):
                 case _:
                     raise SystemExit("Error in parsing Frama-C script's output")
 
-    breakpoint()
     return pretty_value_sets
