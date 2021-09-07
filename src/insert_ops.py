@@ -76,7 +76,7 @@ class ZFP:
         Insert synthesized opaque predicates (construction+obfuscation) back to source
         """
         for filepath in self.opaque_predicates.keys():
-            src_code = get_file_content(filepath, return_type="list")            
+            src_code = get_file_content(os.path.join(self.wdir, filepath), return_type="list")            
             for line_number, ops in self.opaque_predicates[filepath].items():
                 for op in ops:
                     self.op_nums += 1
@@ -99,8 +99,9 @@ class ZFP:
         """
         # Format Rosette result to prime it for injection
         opaque_predicates = dict()
+        opaque_expressions = self.opaque_expressions[0].split("\n")
         index = 0
-        for expression in self.opaque_expressions:
+        for expression in opaque_expressions:
             label = "label"+str(index)
             try: 
                 opaqueness, key, comparator, constant = expression.split(" ")
@@ -123,7 +124,7 @@ class ZFP:
             elif opaqueness == "f":
                 content[loc].append("if("+var+" "+comparator+" "+constant+"){"+ZFP.PARAMS.obfuscation.format(index)+"}")
             index += 1
-        breakpoint()
+
         return opaque_predicates
 
     def _get_value_sets(self):
@@ -209,10 +210,6 @@ def main(wdir, host_src_dir):
     logging.info("Frama-C runtime (formatted): "+str(timedelta(seconds=(obfuscated.framac_runtime))))
     logging.info("value sets that didn't make it as opaque predicates, or unsat("+str(len(obfuscated.failed_vsa2op))+")")
     logging.info("value sets that didn't make it as value sets since it's only zero("+str(len(obfuscated.failed_vsa))+")")
-    logging.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    logging.info("values that are unsat: ")
-    for failed in obfuscated.failed_vsa2op:
-        logging.info(pprint.pformat(failed, indent=4))
     logging.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     logging.info("values that are too simple: ")
     for failed in obfuscated.failed_vsa:
