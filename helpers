@@ -3,7 +3,7 @@
 # Build docker images
 buildc ()
 {
-  docker build . --tag zfp-main -f docker-main
+  docker build . --tag zfp-container -f docker-zfp
 }
 
 # remove all stopped containers
@@ -15,15 +15,9 @@ killc ()
 # start analysis
 startc ()
 {
-  docker run -t -d -v $(pwd)/dataset:/dataset -v $(pwd)/src:/src --name zfp-main zfp-main
-  MAIN_ID=$(docker ps -qf "name=^zfp-main$")
+  docker run -t -d -v $(pwd)/dataset:/dataset -v $(pwd)/src:/src --name zfp-container zfp-container
+  MAIN_ID=$(docker ps -qf "name=^zfp-container$")
   docker exec -it $MAIN_ID /bin/bash  
-}
-
-# tar the llvm folders under install since we untar it in docker-main
-tar_llvm ()
-{
-  tar -czvf ./installs/llvm/llvm-3.8.0.src.tar.gz ./installs/llvm/llvm-3.8.0.src
 }
 
 # remove zfp metadata 
