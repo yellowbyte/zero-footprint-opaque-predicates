@@ -6,9 +6,9 @@ Take the following one-line if statement for example:
 if(isTrue(x)) y = 0;
 ```
 
-To simplify the example, assumed that the tool infers that variable `y` has a value of `{0}` and insert opaque predicate after the instruction like such: `y=0;if x!=0 {[obfuscation]}`.
+To simplify the example, assumed a simple value set where the tool infers that variable `y` has a value set of `{0}` and insert an opaque predicate after the instruction like such: `y=0;if y!=0 {[obfuscation]}`.
 
-However, the inserted opaque predicate is only correct if `if x!=0 {[obfuscation]}` is in the same scope as `y=0;`, which is not true in the case of this one-line if statement.
+However, the inserted opaque predicate is only correct if `if y!=0 {[obfuscation]}` is in the same scope as `y=0;`, which is not true in the case of this one-line if statement.
 
 Same can be said for the following one-line while and for-loop:
 
@@ -18,3 +18,10 @@ while(isTrue(x)) y = 0;
 ```C
 for(int x=0; x<10; x++) y = 0;
 ```
+
+Note that this type of one-liner will not be problematic though: 
+```C
+isTrue(x) ? y=0 : y=1;
+```
+
+This is because Frama-C will process that line of code as `tmp_*=0` and `tmp_*=1` and our tool will ignore value sets whose corresponding variable's name starts with `tmp_`.
