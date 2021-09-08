@@ -24,4 +24,4 @@ Note that this type of one-liner will not be problematic though:
 isTrue(x) ? y=0 : y=1;
 ```
 
-This is because Frama-C will process that line of code as `tmp_*=0` and `tmp_*=1` and our tool will ignore value sets whose corresponding variable's name starts with `tmp_`.
+This is because Frama-C will internally represent that line of code as `tmp_*=0` and `tmp_*=1` and our tool will ignore value sets whose corresponding variable's name starts with `tmp_` since that is the naming convention Frama-C uses to represent intermediate variables.
