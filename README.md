@@ -4,7 +4,7 @@
 
 Our inserted opaque predicates' obfuscation is a deterministic and impossible instruction sequence. This is to allow us to detect our opaque predicates so we can evaluate them with deobfuscation tools. In practice, the obfuscation should not always be the same sequence (or else it is easily detected from the obfuscation). 
 
-_Current tool implementation has some pitfalls (check <b>Other Notes and Pitfalls</b> section). A list of our TODOs can be found in todos.md_
+_Current tool implementation has some pitfalls (check <b>Other Notes and Pitfalls</b> section). A list of our TODOs can be found in [todos.md](todos.md)_
 
 ## Getting Started
 
@@ -23,6 +23,7 @@ _Current tool implementation has some pitfalls (check <b>Other Notes and Pitfall
   * Make sure the folder containing target source code has the following additional files: 
     * `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. 
     * `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file.
+  * if the program crashes, check out [debugging\_tips.md](debugging\_tips.md) for help
 
 #### Settings
 The followings are settings user can change:
