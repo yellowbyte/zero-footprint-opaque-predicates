@@ -12,9 +12,6 @@ from pathlib import Path
 
 ### Configurations ###
 ######################
-# NOTE: recommend to set this to "/tmp". However, if you are in a VM, avoid setting it to "/tmp".
-#       There's a bug where in the Docker container, folder in "/tmp" will be mounted to the VM as empty folder.
-#       tested myself + web: https://stackoverflow.com/questions/37673140/docker-volume-located-in-tmp-on-osx-empty
 configs = {
     "metadata_dir": "/tmp",
 

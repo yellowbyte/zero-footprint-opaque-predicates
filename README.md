@@ -18,12 +18,14 @@ _Current tool implementation has some pitfalls (check <b>Other Notes and Pitfall
 #### To Run (assumed in project root directory)
 * startc (assumed you ran `source helpers`. This command will drop you inside the Docker container)
 * python3.10 src/insert\_ops.py [filepath to the folder containing target source code]
-  * make sure the folder containing target source code has the following additional files: 
+  * We assume your project root directory contains a folder called `dataset` and that folder will be mounted to the `\dataset` folder inside the container.
+    * To change the location of the target source code, you just have to change the `startc` command from the `helpers` file.
+  * Make sure the folder containing target source code has the following additional files: 
     * `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. 
     * `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file.
 
 #### Settings
-The following are settings user can change:
+The followings are settings user can change:
 * `metadata_dir`: path to directory where metadata will be stored. Default to /tmp
 * `delete_metadata`: set to either True or False. Decides whether to delete the metadata folder. Default to True
 * `obfuscation`: what non-executable code to inject as the obfuscation
@@ -45,4 +47,4 @@ User can also directly change the settings by updating the `configs` dictionary 
 
 * Cannot obfuscate code that contains recursive calls. This is a limitation of one of our dependencies, Frama-C
   * stated in [Frama-C's website under the "Technical Notes" section](https://www.frama-c.com/fc-plugins/eva.html).
-* Target C file cannot condense if statement or for loop to one line. This is because the value set identified by Frama-C will be for the code inside that one line if statement or for loop, but the corresponding synthesized opaque predicate will be outside of the one line if statement or for loop when inserted into the source code.
+* Target C file cannot use one-line for-loop, while-loop, or if statement. This is because the value set identified by Frama-C will be for the code inside scope of the one-liner, but the corresponding synthesized opaque predicate will be inserted outside scope of the one-liner. [Here is a more concrete explanation](problematic_oneliner_ex.md).
