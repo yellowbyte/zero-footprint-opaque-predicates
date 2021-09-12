@@ -208,7 +208,7 @@ if __name__ == "__main__":
     shutil.copytree(host_src_dir, wdir)
 
     # Set up log handlers
-    fh = logging.FileHandler(os.path.join(host_src_dir, "zfp.log"))
+    fh = logging.FileHandler(os.path.join(host_src_dir, "zfp.log"), mode="w")
     fh.setLevel(logging.INFO)
     sh = logging.StreamHandler()
     sh.setLevel(logging.DEBUG)

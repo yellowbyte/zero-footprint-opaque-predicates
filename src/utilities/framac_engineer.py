@@ -9,12 +9,15 @@ from .file_engineer import *
 
 def extract_vars(instr):
     """
+    Given a C `instr`, return a list containing all the variable names it uses
     """
     return set(re.findall(r"[a-zA-Z]\w*", instr))
 
 
 def extract_metadata(metadata):
     """
+    Given `metadata` produced from the custom Frama-C script, 
+    extract the line number and instruction information
     """
     loc_index = metadata.find("current line: ")
     instr = metadata[len("current instruction: "):loc_index]
@@ -24,6 +27,8 @@ def extract_metadata(metadata):
 
 def is_oneliner(instr):
     """
+    Return True if `instr` is a one-liner if, while, or for-loop statement.
+    Else, return False
     """
     # TODO
     return 
