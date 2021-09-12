@@ -1,20 +1,16 @@
 #!/bin/bash
 
 # Build docker images
-buildc ()
+zfpbuild ()
 {
   docker build . --tag zfp-container -f docker-zfp
 }
 
-# remove all stopped containers
-killc ()
-{
-  docker rm $(docker ps -a -q)
-}
+
 
 # start analysis
 # testing
-startct ()
+zfpstarttest ()
 {
   docker run -t -d -v $(pwd)/dataset:/dataset -v $(pwd)/src:/src --name zfp-container zfp-container
   MAIN_ID=$(docker ps -qf "name=^zfp-container$")
@@ -23,7 +19,7 @@ startct ()
 
 # start analysis
 # production
-startc ()
+zfpstart ()
 {
   docker run -t -d -v $(pwd)/dataset:/dataset --name zfp-container zfp-container
   MAIN_ID=$(docker ps -qf "name=^zfp-container$")
@@ -31,13 +27,18 @@ startc ()
 }
 
 # remove zfp metadata 
-rmm ()
+zfprm ()
 {
   rm -rf zfp-0.*
 }
 
+# remove all stopped containers
+dockerrm ()
+{
+  docker rm $(docker ps -a -q)
+}
 # stop and remove all running docker containers
-docker_clean ()
+dockerclean ()
 {
   docker stop $(docker ps -a -q)
   docker rm $(docker ps -a -q)
@@ -45,12 +46,12 @@ docker_clean ()
 
 # restart docker
 # https://stackoverflow.com/questions/31365827/cannot-stop-or-restart-a-docker-container
-docker_fresh ()
+dockerfresh ()
 {
   sudo systemctl restart docker.socket docker.service
 }
 
-# detach from container terminal: Ctrl-P n Ctrl-Q
+# detach from container terminal: Ctrl-P and Ctrl-Q
 # how to de-attach: https://stackoverflow.com/questions/19688314/how-do-you-attach-and-detach-from-dockers-process
 
 
