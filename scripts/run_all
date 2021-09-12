@@ -47,7 +47,7 @@ zfp_binsec()
     # NOTE: you may have to change the BINSEC docker image version based on which one is installed on your machine
     # binsec-0.3 is the newest version at the time of experiment
     touch tmp.zfp
-    docker run -t -d -v $(pwd)/storage/final-dataset:/home/binsec/storage/final-dataset --name binsec binsec/binsec-0.3:v1
+    docker run -t -d -v $(pwd)/dataset:/home/binsec/dataset --name binsec binsec/binsec-0.3:v1
     BINSEC_ID=$(docker ps -qf "name=^binsec$")
     for filepath in ${1}/*/; do
         echo ${filepath}

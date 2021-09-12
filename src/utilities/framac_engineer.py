@@ -7,6 +7,12 @@ from collections import defaultdict
 from .file_engineer import *
 
 
+def extract_vars(instr):
+    """
+    """
+    return set(re.findall(r"[a-zA-Z]\w*", instr))
+
+
 def extract_metadata(metadata):
     """
     """
@@ -48,6 +54,7 @@ def framac_output_split(framac_out, params):
             continue
 
         instr, loc = extract_metadata(metadata)        
+        var_names = extract_vars(instr)
 
 # TODO
 #        # current instruction is a oneliner 
@@ -61,16 +68,15 @@ def framac_output_split(framac_out, params):
             is_bool = False
 
             # only want value sets of variable that is used in current instruction
-            # TODO: better way to detect if var_name is in current instruction
-            if var_name not in instr:
+            if var_name not in var_names:
                 continue
             if var_name == "__retres":
                 # return value statement
                 continue
-            if "tmp_" in var_name:
+            if "tmp" in var_name:
                 # Frama-C internal variable to keep track of intermediate values
                 # Variable does not exist in original source. Unless developer 
-                # names the variable to start with "tmp_", in that case cannot
+                # names the variable to start with "tmp" or "tmp_", in that case cannot
                 # differentiate so ignore to be safe
                 # EX: return value from rand()
                 continue

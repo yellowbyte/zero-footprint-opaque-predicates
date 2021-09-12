@@ -13,7 +13,7 @@ from pathlib import Path
 ### Configurations ###
 ######################
 configs = {
-    "metadata_dir": "/tmp",
+    "metadata_dir": "/dataset",
 
     "delete_metadata": False,
 

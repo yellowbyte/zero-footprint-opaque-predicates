@@ -81,7 +81,7 @@ class ZFP:
                 for op in ops:
                     self.op_nums += 1
                     src_code[int(line_number)-1] += op
-            with open(filepath, "w") as f:
+            with open(os.path.join(self.wdir,filepath), "w") as f:
                 f.write("\n".join(src_code))
       
     def _get_opaque_expressions(self):
@@ -153,26 +153,6 @@ class ZFP:
         # clean up residue
         framac_raw_output.split("make: Leaving directory", 1)[0]
         return framac_raw_output
-
-    def _run_llvm(self, filepath, src_code):
-        """
-        Run the two LLVM passes
-        """
-        filepath_bc = get_filepath_ext(filepath, "bc")
-        logging.debug("run_llvm: "+filepath)
-        logging.debug("run_llvm: "+filepath_bc)
-        # Assume in container so directory is: /llvm-base/build
-        # cmd: opt -load lib/LLVMFindVars.so -findvars [name].bc
-        # layout: line number, variable name, func name
-        cmd = "opt -load lib/LLVMFindVars.so -findvars "+filepath_bc
-        llvm_vars_output = shell_exec(cmd)
-        # layout: func name, ending line, starting line
-        cmd = "opt -load lib/LLVMFuncsEnd.so -funcsend "+filepath_bc
-        llvm_funcs_output = shell_exec(cmd)
-
-        variables = extract_findvars(llvm_vars_output)
-        funcs_possible_end = extract_funcsend(llvm_funcs_output)
-        return filter_nonexistent_vars(src_code, variables), get_funcs_end(src_code, funcs_possible_end)
 
 
 def main(wdir, host_src_dir):
