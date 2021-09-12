@@ -6,8 +6,6 @@ zfpbuild ()
   docker build . --tag zfp-container -f docker-zfp
 }
 
-
-
 # start analysis
 # testing
 zfpstarttest ()

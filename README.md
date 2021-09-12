@@ -10,14 +10,14 @@ Our inserted opaque predicates' obfuscation is a deterministic and impossible in
 * Docker 
 
 #### Installation (assumed in project root directory)
-1. source helpers
+1. source zfpcmds
 2. zfpbuild (will build a Docker image that contains everything you needed to run this tool)
 
 #### To Run (assumed in project root directory)
-* zfpstart (assumed you ran `source helpers`. This command will drop you inside the Docker container)
+* zfpstart (assumed you ran `source zfpcmds`. This command will drop you inside the Docker container)
 * python3.10 src/insert\_ops.py [filepath to the folder containing target source code]
   * We assume your project root directory contains a folder called `dataset` and that folder will be mounted to the `\dataset` folder inside the container.
-    * To change the location of the target source code to a folder other than `dataset`, you just have to change the `zfpstart` command from the `helpers` file.
+    * To change the location of the target source code to a folder other than `dataset`, you just have to change the `zfpstart` command from the `zfpcmds` file.
   * Make sure the folder containing target source code has the following additional files: 
     * `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. 
     * `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file.
