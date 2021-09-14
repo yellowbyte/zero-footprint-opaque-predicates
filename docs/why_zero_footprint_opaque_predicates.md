@@ -1,4 +1,4 @@
-## What Is Zero Footprint Opaque Predicates Work And How It Works
+## Why Zero Footprint Opaque Predicates?
 
 For a detailed explanation, check out our [paper](https://rdcu.be/cpnNf). But if you just want a simplified explanation, this document is for you! 
 
