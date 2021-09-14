@@ -59,8 +59,8 @@ RUN raco pkg install custom-load
 RUN raco pkg install rfc6455
 RUN raco pkg install rosette
 # Get Rosette code
-COPY ./installs/rosette/expr-gen.rkt /synthesis/
-COPY ./installs/rosette/get_synthesis.sh /synthesis/
+COPY ./tools/rosette/expr-gen.rkt /synthesis/
+COPY ./tools/rosette/get_synthesis.sh /synthesis/
 
 ###  Install Frama-C
 RUN opam init --disable-sandboxing --shell-setup
@@ -78,7 +78,7 @@ ENV OCAML_TOPLEVEL_PATH='/root/.opam/default/lib/toplevel'
 ENV PKG_CONFIG_PATH='/root/.opam/default/lib/pkgconfig'
 ENV MANPATH=':/root/.opam/default/man'
 ENV PATH='/root/.opam/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-COPY ./installs/frama-c/prettyvsa.ml / 
+COPY ./tools/frama-c/prettyvsa.ml / 
 COPY ./src /src
 
 ### Install Python 3.10
