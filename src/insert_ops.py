@@ -65,7 +65,7 @@ class ZFP:
         # ~~~ main operations ~~~
 
     @property
-    def filepath_json(self):
+    def vsa_json(self):
         """
         Filepath to the value analysis output        
         """
@@ -76,12 +76,14 @@ class ZFP:
         Insert synthesized opaque predicates (construction+obfuscation) back to source
         """
         for filepath in self.opaque_predicates.keys():
+            # Each `filepath` is a relative path to a C source file
             src_code = get_file_content(os.path.join(self.wdir, filepath), return_type="list")            
             for line_number, ops in self.opaque_predicates[filepath].items():
                 for op in ops:
                     self.op_nums += 1
                     src_code[int(line_number)-1] += op
-            with open(os.path.join(self.wdir,filepath), "w") as f:
+            with open(os.path.join(self.wdir, filepath), "w") as f:
+                # Write back the obfuscated C source file
                 f.write("\n".join(src_code))
       
     def _get_opaque_expressions(self):
@@ -89,7 +91,7 @@ class ZFP:
         Perform synthesis to get the opaque expressions (construction)
         """
         # Run Rosette
-        cmd = "/synthesis/get_synthesis.sh "+self.filepath_json
+        cmd = "/synthesis/get_synthesis.sh "+self.vsa_json
         opaque_expressions = shell_exec(cmd).rstrip("\r").split("\r\n")
         return opaque_expressions
 
@@ -137,7 +139,7 @@ class ZFP:
         # object of type set is not JSON serializable 
         # the JSON file is for Rosette
         value_sets = {k:list(v) for k,v in value_sets.items()}
-        with open(self.filepath_json, "w") as f:
+        with open(self.vsa_json, "w") as f:
             json.dump(value_sets, f)
         return value_sets
 
@@ -207,7 +209,7 @@ if __name__ == "__main__":
     wdir = os.path.join(configs["metadata_dir"], "zfp-"+str(random()))
     shutil.copytree(host_src_dir, wdir)
 
-    # Set up log handlers
+    # Set up logging 
     fh = logging.FileHandler(os.path.join(host_src_dir, "zfp.log"), mode="w")
     fh.setLevel(logging.INFO)
     sh = logging.StreamHandler()
