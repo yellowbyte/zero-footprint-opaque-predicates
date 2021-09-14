@@ -15,8 +15,8 @@ Our inserted opaque predicates' obfuscation is a deterministic and impossible in
 
 #### To Run (assumed in project root directory)
 * zfpstart (assumed you ran `source zfpcmds`. This command will drop you inside the Docker container)
-* python3.10 src/insert\_ops.py \dataset\[relative filepath to the folder containing target source code]
-  * We assume your project root directory contains a folder called `dataset` and that folder will be mounted to the `\dataset` folder inside the container.
+* python3.10 src/insert\_ops.py /dataset/[relative filepath to the folder containing target source code]
+  * We assume your project root directory contains a folder called `dataset` and that folder will be mounted to the `/dataset` folder inside the container.
     * To change the location of the target source code to a folder other than `dataset`, you just have to change the `zfpstart` command from the `zfpcmds` file and rerun `source zfpcmds`.
   * Make sure the folder containing target source code has the following additional files: 
     * `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. 
