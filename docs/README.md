@@ -1,6 +1,6 @@
-## Why Zero Footprint Opaque Predicates?
+## What Is Zero Footprint Opaque Predicates?
 
-For a detailed explanation, check out our [paper](https://rdcu.be/cpnNf). But if you just want a simplified explanation, this document is for you! 
+For a detailed explanation, check out our [paper](https://rdcu.be/cpnNf). But if you just want a simplified explanation, this page is for you! 
 
 It's called Zero Footprint Opaque Predicates because the opaque predicates it constructs resemble every other predicates typically found in an unobfuscated binary. 
 
