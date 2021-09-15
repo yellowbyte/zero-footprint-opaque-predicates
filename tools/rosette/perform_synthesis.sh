@@ -16,7 +16,7 @@ do
     cur_vsa=$(echo "${vsas[$key]//,/ }" | tr -d '[],')
 
     # identify opaque predicate that always evaluate to false
-    result=$(racket /synthesis/expr-gen.rkt f ${cur_vsa})
+    result=$(racket /synthesis/synthesize.rkt f ${cur_vsa})
     if test "${result}" != "unsat"
     then
         comparator=$(echo ${result} | tr -d '()' | awk '{print $3}')
@@ -35,7 +35,7 @@ do
 
     # if no opaquely falase predicate, identify opaque predicate that
     # always evaluate to true instead
-    result=$(racket /synthesis/expr-gen.rkt t ${cur_vsa})
+    result=$(racket /synthesis/synthesize.rkt t ${cur_vsa})
     if test "${result}" != "unsat"
     then
         comparator=$(echo ${result} | tr -d '()' | awk '{print $3}')

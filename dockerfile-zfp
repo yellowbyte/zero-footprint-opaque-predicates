@@ -59,8 +59,8 @@ RUN raco pkg install custom-load
 RUN raco pkg install rfc6455
 RUN raco pkg install rosette
 # Get Rosette code
-COPY ./tools/rosette/expr-gen.rkt /synthesis/
-COPY ./tools/rosette/get_synthesis.sh /synthesis/
+COPY ./tools/rosette/synthesize.rkt /synthesis/
+COPY ./tools/rosette/perform_synthesis.sh /synthesis/
 
 ###  Install Frama-C
 RUN opam init --disable-sandboxing --shell-setup

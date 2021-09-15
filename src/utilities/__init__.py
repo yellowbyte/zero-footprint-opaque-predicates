@@ -1,11 +1,10 @@
-from .llvm_engineer import *
-from .file_engineer import *
 from .framac_engineer import *
 
 import os 
 import pdb
 import json
 import logging 
+import subprocess
 
 from pathlib import Path
 
@@ -63,14 +62,18 @@ def shell_exec(cmd):
     logging.debug(cmd)
     # Capture_output argument is only available in Python >= 3.7
     result = subprocess.run(cmd.split(), capture_output=True)
-    logging.debug("    "+result.stdout.decode("utf-8").rstrip("\n"))
+    logging.debug("SHELL_EXEC: "+result.stdout.decode("utf-8").rstrip("\n"))
     return result.stdout.decode("utf-8").rstrip("\n")
 
 
-def shell2file(filepath, cmd):
+def get_file_content(filepath, return_type="list"):
     """
-    Save result from running `cmd` in shell at `filepath`
+    Bring content of file at `filepath` to memory
     """
-    content = shell_exec(cmd)
-    with open(filepath, "w") as f:
-        f.write(content)
+    filtered = list()
+    with open(filepath, "r") as f:
+        if return_type == "list":
+            content = [l.rstrip("\n") for l in f.readlines()]
+        else:
+            content = f.read()
+    return content

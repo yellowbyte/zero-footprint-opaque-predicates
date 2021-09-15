@@ -12,10 +12,9 @@ import filecmp
 import logging 
 import traceback
 
-from random import seed
-from random import random
 from time import perf_counter 
 from datetime import timedelta
+from random import random, seed
 from collections import defaultdict, namedtuple
 
 from utilities import *
@@ -50,13 +49,13 @@ class ZFP:
         # ~~~ main operations ~~~
         # (1) Perform Value Analysis 
         # Run Frama-C to perform value analysis
-        # Parse Frama-C's output to identify value-set
+        # Parse Frama-C's output to identify value set
         self.value_sets = self._get_value_sets()
 
         # (2) Perform Synthesis
         # Pass value set to Rosette to perform synthesis
         self.opaque_expressions = self._get_opaque_expressions()
-        # Create opaque predicates from synthesis result (i.e., create the if statement)
+        # Create opaque predicates from synthesized output
         self.opaque_predicates = self._get_opaque_predicates()
 
         # (3) Perform Injection
@@ -91,19 +90,21 @@ class ZFP:
         Perform synthesis to get the opaque expressions (construction)
         """
         # Run Rosette
-        cmd = "/synthesis/get_synthesis.sh "+self.vsa_json
-        opaque_expressions = shell_exec(cmd).rstrip("\r").split("\r\n")
+        cmd = "/synthesis/perform_synthesis.sh "+self.vsa_json
+        opaque_expressions = shell_exec(cmd)
         return opaque_expressions
 
     def _get_opaque_predicates(self):
         """
         Create opaque predicates (construction+obfuscation) from the opaque expressions (construction)
         """
-        # Format Rosette result to prime it for injection
+        # Format synthesized outputs to prime them for injection
         opaque_predicates = dict()
-        opaque_expressions = self.opaque_expressions[0].split("\n")
+        opaque_expressions = self.opaque_expressions.split("\n")
         index = 0
         for expression in opaque_expressions:
+            # t/f <expr>
+            # <expr>= <relative filepath>:<line number>:<variable name> <comparator> <constant>
             label = "label"+str(index)
             try: 
                 opaqueness, key, comparator, constant = expression.split(" ")
@@ -147,7 +148,7 @@ class ZFP:
         """
         Perform Value Analysis with Frama-C
         """
-        cmd = "make -C "+self.wdir  # call Frama-C (i.e., make GNUmakefile)
+        cmd = "make -C "+self.wdir  # call Frama-C (i.e., content of GNUmakefile)
         time_before = perf_counter()
         framac_raw_output = shell_exec(cmd)
         time_after = perf_counter()

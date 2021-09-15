@@ -4,8 +4,6 @@ import logging
 
 from collections import defaultdict
 
-from .file_engineer import *
-
 
 def extract_vars(instr):
     """
