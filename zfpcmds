@@ -10,7 +10,7 @@ zfpbuild ()
 # testing
 zfpstarttest ()
 {
-  docker run -t -d -v $(pwd)/dataset:/dataset -v $(pwd)/src:/src --name zfp zfp
+  docker run -t -d -v $(pwd)/scripts:/scripts -v $(pwd)/dataset:/dataset -v $(pwd)/src:/src --name zfp zfp
   MAIN_ID=$(docker ps -qf "name=^zfp$")
   docker exec -it $MAIN_ID /bin/bash  
 }
@@ -19,7 +19,7 @@ zfpstarttest ()
 # production
 zfpstart ()
 {
-  docker run -t -d -v $(pwd)/dataset:/dataset --name zfp zfp
+  docker run -t -d -v $(pwd)/scripts:/scripts -v $(pwd)/dataset:/dataset --name zfp zfp
   MAIN_ID=$(docker ps -qf "name=^zfp$")
   docker exec -it $MAIN_ID /bin/bash  
 }

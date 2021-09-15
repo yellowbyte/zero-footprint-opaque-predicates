@@ -6,7 +6,7 @@ zfp_main()
 {
     for filepath in ${1}/*/; do
         echo ${filepath}
-        python3.7 src/insert_ops.py ${filepath}
+        python3.10 src/insert_ops.py ${filepath}
     done
 }
 
@@ -16,7 +16,7 @@ zfp_identify()
     for filepath in ${1}/*/; do
         echo ${filepath}
         exe=$(find ${filepath} -executable -type f ! -name "*.orig" ! -name "*.sh")  # return relative path
-        python scripts/identify_zfp.py ${exe} > ${filepath}op_locations.zfp
+        python3 scripts/identify_zfp.py ${exe} > ${filepath}op_locations.zfp
     done
 }
 

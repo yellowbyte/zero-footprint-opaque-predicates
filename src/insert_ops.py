@@ -178,10 +178,6 @@ def main(wdir, host_src_dir):
               if not f.endswith(".json") and not f.endswith(".bc") and not \
               f.endswith(".c") and not f.endswith(".eva") and not f.endswith(".parse")]
 
-    # Move the compiled binary to original directory
-    for f in new_files:
-        shutil.move(os.path.join(wdir, f), os.path.join(host_src_dir, f))
-
     # Statistics
     logging.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     logging.info("current: "+host_src_dir)
@@ -197,6 +193,21 @@ def main(wdir, host_src_dir):
     logging.info("values that are too simple: ")
     for failed in obfuscated.failed_vsa:
         logging.info(pprint.pformat(failed, indent=4))
+
+    # Move the compiled binary to original directory
+    # Copy back everything except C files, zfp.log and vsa.json. C files are modified by this tool (with OP added in)
+    # zfp.log in wdir is the old log
+    for subdir, dirs, files in os.walk(wdir):
+        for _file in files:
+            if _file.endswith(".c"):
+                continue
+            if _file == "vsa.json":
+                continue
+            if _file == "zfp.log":
+                continue
+            relative_filepath = os.path.relpath(subdir, wdir)
+            shutil.move(os.path.join(wdir, relative_filepath, _file), os.path.join(host_src_dir, relative_filepath, _file))
+
 
 
 if __name__ == "__main__":
