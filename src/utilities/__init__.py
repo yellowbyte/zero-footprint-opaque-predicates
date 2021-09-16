@@ -12,7 +12,7 @@ from pathlib import Path
 ### Configurations ###
 ######################
 configs = {
-    "metadata_dir": "/dataset",
+    "metadata_dir": "/tmp",
 
     "delete_metadata": False,
 
@@ -23,8 +23,8 @@ configs = {
 
     # NOTE: python can only hold so many values in-memory. Higher "value_set_limit" allows you to possibly generate
     #       more opaque predicates but will also slow down program or worst-case, prematurely terminate it.
-    "value_set_limit": 100000000,  # we found this value to work well for our benchmark. Can choose a larger value if desired.
-    # "value_set_limit": 10000,    # However, if program terminates prematurely, choose a smaller value (like this one)
+    #"value_set_limit": 100000000,  # we found this value to work well for our benchmark. Can choose a larger value if desired.
+     "value_set_limit": 10000,    # However, if program terminates prematurely, choose a smaller value (like this one)
 
     ### Specific to running Frama-C
     "framac_macro": "Frama_C_show_each_",

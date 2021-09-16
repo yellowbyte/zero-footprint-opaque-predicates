@@ -187,12 +187,6 @@ def main(wdir, host_src_dir):
     logging.info("time it takes to obfuscate (formatted): "+str(timedelta(seconds=(timer_stop-timer_start))))
     logging.info("Frama-C runtime (seconds): "+str(obfuscated.framac_runtime))
     logging.info("Frama-C runtime (formatted): "+str(timedelta(seconds=(obfuscated.framac_runtime))))
-    logging.info("value sets that didn't make it as opaque predicates, or unsat("+str(len(obfuscated.failed_vsa2op))+")")
-    logging.info("value sets that didn't make it as value sets since it's only zero("+str(len(obfuscated.failed_vsa))+")")
-    logging.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    logging.info("values that are too simple: ")
-    for failed in obfuscated.failed_vsa:
-        logging.info(pprint.pformat(failed, indent=4))
 
     # Move the compiled binary to original directory
     # Copy back everything except C files, zfp.log and vsa.json. C files are modified by this tool (with OP added in)
@@ -205,9 +199,14 @@ def main(wdir, host_src_dir):
                 continue
             if _file == "zfp.log":
                 continue
+            # analysis results from Frama-C. Don't need
+            if subdir.endswith(".eva"):
+                continue
+            if subdir.endswith(".parse"):
+                continue
+
             relative_filepath = os.path.relpath(subdir, wdir)
             shutil.move(os.path.join(wdir, relative_filepath, _file), os.path.join(host_src_dir, relative_filepath, _file))
-
 
 
 if __name__ == "__main__":

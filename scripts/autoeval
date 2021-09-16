@@ -5,8 +5,8 @@
 zfp_main()
 {
     for filepath in ${1}/*/; do
-        echo ${filepath}
-        python3.10 src/insert_ops.py ${filepath}
+	echo ${filepath}
+        python3.10 /src/insert_ops.py ${filepath}
     done
 }
 

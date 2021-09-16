@@ -37,7 +37,7 @@ def framac_output_split(framac_out, params):
     """
     pretty_value_sets = defaultdict(set)    
 
-    _, prettyvsa_curfuncs_output = framac_out.split("START PRETTY VSA (ZFP)")
+    prettyvsa_curfuncs_output = framac_out.split("START PRETTY VSA (ZFP)")[-1]
     prettyvsa_output, curfuncs_output = prettyvsa_curfuncs_output.split("FUNCTIONS IN SOURCE (ZFP)")
     curfuncs = curfuncs_output.split()
     # last item is not part of the result
@@ -50,7 +50,11 @@ def framac_output_split(framac_out, params):
         # metadata contains instruction, filename, and line number
         metadata = value_sets_nonewline[:end_of_metadata_index]
         # value set from Frama-C script print value set to stdout in the format of a Python list
-        value_sets = eval(value_sets_nonewline[end_of_metadata_index+len("END_OF_METADATA"):])
+        try:
+            # TODO: may fail. Investigate more since my custom script should print to stdout a python formatted list
+            value_sets = eval(value_sets_nonewline[end_of_metadata_index+len("END_OF_METADATA"):])
+        except:
+            continue
 
         # list is empty (no value sets)
         if not value_sets:
@@ -67,7 +71,8 @@ def framac_output_split(framac_out, params):
 
         # parse content of value_sets
         for vs in value_sets:
-            var_name, _set = vs.split(":")
+            var_name, _set = vs.split(":{{")  # content of _set may also contain the char ":"
+            _set = "{{" + _set
             is_bool = False
 
             # only want value sets of variable that is used in current instruction
@@ -109,6 +114,8 @@ def framac_output_split(framac_out, params):
                         continue
                     if "NaN" in to_extract:
                         continue
+                    if "mix of " in to_extract:
+                        continue
 
                     # Frama-C represents Boolean variable differently. However, when inserted back
                     # into source, we need the original variable name. So here we reconstruct the 
@@ -130,17 +137,23 @@ def framac_output_split(framac_out, params):
                             pretty_value_sets[loc+":"+var_name].update(
                                 list(range(int(start), int(end)+1))
                             )
-                        case ["[", *_range, "]", ",", remainder, "%", divisor]:  # EX: [1..245],0%2
-                            _range = "".join(_range)
-                            start, end = _range.split("..")
+                        case _ if "," in list(to_extract) and "%" in list(to_extract):  # EX: [1..245],0%20
+                            # range can be negative
+                            # numbers in general, does not have to be single digit
+                            match = re.search(r'\[([0-9-]+)\.\.([0-9-]+)\],([0-9]+)%([0-9]+)', to_extract)
+                            start = match.group(1)
+                            end = match.group(2)
+                            remainder = match.group(3)
+                            divisor = match.group(4)
+
                             if int(end)-int(start) > params.value_set_limit:
                                 continue
                             pretty_value_sets[loc+":"+var_name].update(
                                 [i for i in list(range(int(start), int(end)+1)) if i%int(divisor)==int(remainder)]
                             )
                         case _:
-                            raise SystemExit("Error in parsing Frama-C script's output")
+                            continue
                 case _:
-                    raise SystemExit("Error in parsing Frama-C script's output")
+                    continue
 
     return pretty_value_sets
