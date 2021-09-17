@@ -2,4 +2,4 @@
 2. Option to choose from various kinds of opaque predicates' obfuscation (e.g., junk bytes, random branch)
 3. Support to insert opaque predicates into multi-files project.
 4. Option to remove opaque predicates that are detected by automated tools so that the remaining opaque predicates have higher resilience.
-5. After (1) - (2), put Docker image on Dockerhub
+5. After (1) - (4), put Docker image on Dockerhub

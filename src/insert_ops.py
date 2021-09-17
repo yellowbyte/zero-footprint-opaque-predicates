@@ -200,6 +200,7 @@ def main(wdir, host_src_dir):
             if _file == "zfp.log":
                 continue
             # analysis results from Frama-C. Don't need
+            # or else can't rerun unless user manually delete these folders
             if subdir.endswith(".eva"):
                 continue
             if subdir.endswith(".parse"):
