@@ -47,6 +47,10 @@ class ZFP:
         self.op_nums = 0
 
         # ~~~ main operations ~~~
+        # (0) One-Liner Identification
+        # TODO: oneliner
+        self.ignored_lines = self._identify_oneliner()
+
         # (1) Perform Value Analysis 
         # Run Frama-C to perform value analysis
         # Parse Frama-C's output to identify value set
@@ -69,6 +73,13 @@ class ZFP:
         Filepath to the value analysis output        
         """
         return os.path.join(self.wdir, "vsa.json")
+
+    # TODO: oneliner
+    def _identify_oneliner(self):
+        """
+        """
+        ignored_lines = list()  # list of int
+        return ignored_lines
 
     def _perform_injection(self):
         """
@@ -134,6 +145,8 @@ class ZFP:
         """
         Parse, beautify, and save Frama-C's value analysis result as JSON
         """
+        # TODO: oneliner
+        # value_sets = framac_output_split(self._run_framac(), self.ignored_lines, ZFP.PARAMS)
         value_sets = framac_output_split(self._run_framac(), ZFP.PARAMS)
 
         # Save value_sets result (dictionary) as json
@@ -215,7 +228,7 @@ if __name__ == "__main__":
     host_src_dir = sys.argv[1]
     set_configs(host_src_dir)
 
-    # Create tmp working dir
+    # Create tmp working dir (wdir)
     millis = int(round(time.time() * 1000))
     seed(millis)  # Make random() as random as possible
     wdir = os.path.join(configs["metadata_dir"], "zfp-"+str(random()))
