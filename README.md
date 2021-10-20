@@ -46,4 +46,3 @@ User can also directly change the settings by updating the `configs` dictionary 
 
 * Cannot obfuscate code that contains recursive calls. This is a limitation of one of our dependencies, Frama-C
   * stated in [Frama-C's website under the "Technical Notes" section](https://www.frama-c.com/fc-plugins/eva.html).
-* Target C file cannot use one-line for-loop, while-loop, or if statement. This is because the value set identified by Frama-C will be for the code inside scope of the one-liner, but the corresponding synthesized opaque predicate will be inserted outside scope of the one-liner. [Here is a more concrete explanation](docs/problematic_oneliner_example.md).

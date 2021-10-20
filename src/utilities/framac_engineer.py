@@ -23,9 +23,7 @@ def extract_metadata(metadata):
     return instr, loc    
 
 
-# TODO: oneliner
-# def framac_output_split(framac_out, ignored_lines, params):
-def framac_output_split(framac_out, params):
+def framac_output_split(framac_out, ignored_lines, params):
     """
     First step in parsing Frama-C value analysis output
     """
@@ -58,12 +56,16 @@ def framac_output_split(framac_out, params):
         instr, loc = extract_metadata(metadata)        
         var_names = extract_vars(instr)
 
-        # TODO: oneliner
         # current instruction is a oneliner 
         # Oneliner (e.g., one-line if statement, one-line for-loop) will mess up our tool
         # EX loc: 09_loop_for_complex.c:7
         # if int(loc.split(":")[1]) in ignored_lines:
         #    continue
+        if loc.split(":")[0] in ignored_lines.keys():
+            # current file contains lines that need to be ignored
+            if loc.split(":")[1] in ignored_lines[loc.split(":")[0]]:
+                # current line needs to be ignored
+                continue
 
         # parse content of value_sets
         for vs in value_sets:
