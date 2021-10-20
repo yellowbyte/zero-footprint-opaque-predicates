@@ -14,7 +14,7 @@ from pathlib import Path
 configs = {
     "metadata_dir": "/tmp",
 
-    "delete_metadata": False,
+    "delete_metadata": True,
 
     ### Obfuscation for the inserted opaque predicates 
     # We purposely make it deterministic so we can detect our opaque predicates for evaluation with other deobfuscation tools.
@@ -23,8 +23,8 @@ configs = {
 
     # NOTE: python can only hold so many values in-memory. Higher "value_set_limit" allows you to possibly generate
     #       more opaque predicates but will also slow down program or worst-case, prematurely terminate it.
-    #"value_set_limit": 100000000,  # we found this value to work well for our benchmark. Can choose a larger value if desired.
-     "value_set_limit": 10000,    # However, if program terminates prematurely, choose a smaller value (like this one)
+    "value_set_limit": 100000000,  # we found this value to work well for our benchmark. Can choose a larger value if desired.
+    #"value_set_limit": 10000,    # However, if program terminates prematurely, choose a smaller value (like this one)
 
     ### Specific to running Frama-C
     "framac_macro": "Frama_C_show_each_",
@@ -36,24 +36,6 @@ configs = {
     "ignored_functions": ["eva_main"],
 }
 
-
-def set_configs(host_src_dir):
-    """
-    Set `configs` to the settings specified in the corresponding zfp.json if it exists
-    """
-    config_file = os.path.join(host_src_dir, "zfp.json")    
-    if not Path(config_file).is_file():
-        return
-    
-    # zfp config file exists in directory containing binary to obfuscate
-    logging.info("zfp.json file exists")
-    global configs 
-    with open(config_file) as json_file:
-        data = json.load(json_file)
-    for k in data.keys():
-        logging.info("key: "+str(k))
-        configs[k] = data[k]
-    
 
 def shell_exec(cmd):
     """

@@ -305,7 +305,6 @@ def main(wdir, host_src_dir):
 if __name__ == "__main__":
     # Set configurations
     host_src_dir = sys.argv[1]
-    set_configs(host_src_dir)
 
     # Create tmp working dir (wdir)
     millis = int(round(time.time() * 1000))
