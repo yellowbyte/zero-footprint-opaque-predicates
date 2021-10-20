@@ -19,10 +19,11 @@ Our inserted opaque predicates' obfuscation is a deterministic and impossible in
   * this command will drop you inside the Docker container
 * python3.10 src/insert\_ops.py [relative filepath to the folder containing target source code]
   * if the program crashes, check out [debugging\_tips.md](docs/debugging\_tips.md) for help
-* Make sure the folder containing target source code has the following additional files: 
-  * `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. 
-  * `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file.
-    * Our dependence on Frama-C also means that our tool cannot obfuscate code that contains recursive calls, [as it is a limitation of Frama-C](https://www.frama-c.com/fc-plugins/eva.html).
+
+__NOTE__: Make sure the folder containing target source code has the following additional files: 
+* `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. [Here is a simple tutorial on how to write a Makefile](https://gist.github.com/yellowbyte/b2b61f547e51e80b30522a989e6ea88d)
+* `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file.
+  * Our dependence on Frama-C also means that our tool cannot obfuscate code that contains recursive calls, [as it is a limitation of Frama-C](https://www.frama-c.com/fc-plugins/eva.html).
 
 #### Settings
 The followings are settings user can change:
