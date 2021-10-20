@@ -1,6 +1,6 @@
 ## Frama-C Setup
 
-[Frama-C](https://frama-c.com/) is a powerful program analysis tool. We use it in this project for its implementation of [abstract interpretation](https://www.di.ens.fr/~cousot/AI/IntroAbsInt.html). As for why we need to use abstract interpretation, check out [our project overview](debugging_tips.md).
+[Frama-C](https://frama-c.com/) is a powerful program analysis tool. We use it in this project for its implementation of [abstract interpretation](https://www.di.ens.fr/~cousot/AI/IntroAbsInt.html). As for why we need to use abstract interpretation, check out [our project overview](README.md).
 
 [Here is a template to use for setting up Frama-C](GNUmakefile_template). Simply change all occurrences of <filename> to the filename of the single C file (without the .c extension). 
 
