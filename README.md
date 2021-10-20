@@ -1,8 +1,8 @@
 ## Overview
 
-[Zero Footprint Opaque Predicates](docs/README.md) obfuscate single-file ([future update will remove this constraint!](docs/todos.md)) C source code with opaque predicates that syntactically and semantically resemble real predicates in order to prevent heuristic attacks (e.g., pattern matching) while maintaining resilience against automated attacks.
+[Zero Footprint Opaque Predicates](docs/README.md) obfuscate single-file C source code with opaque predicates that syntactically and semantically resemble real predicates in order to prevent heuristic attacks (e.g., pattern matching) while maintaining resilience against automated attacks.
 
-Our inserted opaque predicates' obfuscation is a deterministic and impossible instruction sequence ([future update will allow for more options!](docs/todos.md)). This is to allow us to detect our opaque predicates so we can evaluate them with deobfuscation tools. In practice, the obfuscation should not always be the same sequence (or else it is easily detected from the obfuscation). 
+Our inserted opaque predicates' obfuscation is a deterministic and impossible instruction sequence. This is to allow us to detect our opaque predicates so we can evaluate them with deobfuscation tools. In practice, the obfuscation should not always be the same sequence (or else it is easily detected from the obfuscation). 
 
 ## Getting Started
 
