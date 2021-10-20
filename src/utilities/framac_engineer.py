@@ -23,15 +23,7 @@ def extract_metadata(metadata):
     return instr, loc    
 
 
-def is_oneliner(instr):
-    """
-    Return True if `instr` is a one-liner if, while, or for-loop statement.
-    Else, return False
-    """
-    # TODO
-    return 
-
-def framac_output_split(framac_out, params):
+def framac_output_split(framac_out, ignored_lines, params):
     """
     First step in parsing Frama-C value analysis output
     """
@@ -51,7 +43,8 @@ def framac_output_split(framac_out, params):
         metadata = value_sets_nonewline[:end_of_metadata_index]
         # value set from Frama-C script print value set to stdout in the format of a Python list
         try:
-            # TODO: may fail. Investigate more since my custom script should print to stdout a python formatted list
+            # TODO: 
+            # may fail. Investigate more since my custom script should print to stdout a formatted python list
             value_sets = eval(value_sets_nonewline[end_of_metadata_index+len("END_OF_METADATA"):])
         except:
             continue
@@ -63,11 +56,16 @@ def framac_output_split(framac_out, params):
         instr, loc = extract_metadata(metadata)        
         var_names = extract_vars(instr)
 
-# TODO
-#        # current instruction is a oneliner 
-#        # Oneliner (e.g., one-line if statement, one-line for-loop) will mess up our tool
-#        if is_oneliner(instr):
-#            continue
+        # current instruction is a oneliner 
+        # Oneliner (e.g., one-line if statement, one-line for-loop) will mess up our tool
+        # EX loc: 09_loop_for_complex.c:7
+        # if int(loc.split(":")[1]) in ignored_lines:
+        #    continue
+        if loc.split(":")[0] in ignored_lines.keys():
+            # current file contains lines that need to be ignored
+            if loc.split(":")[1] in ignored_lines[loc.split(":")[0]]:
+                # current line needs to be ignored
+                continue
 
         # parse content of value_sets
         for vs in value_sets:

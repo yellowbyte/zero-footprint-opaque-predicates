@@ -39,6 +39,7 @@ class ZFP:
     def __init__(self, wdir):
         self.wdir = wdir  # working directory in /tmp folder
         self.funcs_info = dict()
+        self.ignored_lines = defaultdict(list)
         # Useful statistic
         self.failed_vsa2op = list()  # numbers of unsat 
         self.failed_vsa = list()  # too simple. A value set of just 0
@@ -47,18 +48,24 @@ class ZFP:
         self.op_nums = 0
 
         # ~~~ main operations ~~~
-        # (1) Perform Value Analysis 
+        # (0) Pre-Process or Remove Comments
+        self._iterate_c_files(self._remove_comments)
+
+        # (1) One-Liner Identification
+        self._iterate_c_files(self._identify_oneliner)
+
+        # (2) Perform Value Analysis 
         # Run Frama-C to perform value analysis
         # Parse Frama-C's output to identify value set
         self.value_sets = self._get_value_sets()
 
-        # (2) Perform Synthesis
+        # (3) Perform Synthesis
         # Pass value set to Rosette to perform synthesis
         self.opaque_expressions = self._get_opaque_expressions()
         # Create opaque predicates from synthesized output
         self.opaque_predicates = self._get_opaque_predicates()
 
-        # (3) Perform Injection
+        # (4) Perform Injection
         # Perform opaque predicates injection
         self._perform_injection()
         # ~~~ main operations ~~~
@@ -69,6 +76,91 @@ class ZFP:
         Filepath to the value analysis output        
         """
         return os.path.join(self.wdir, "vsa.json")
+
+    def _iterate_c_files(self, method, args=()):
+        """
+        Call `method` on each C file found
+        """
+        for root, subdirs, files in os.walk(self.wdir):
+            for filename in files:
+                if not filename.endswith(".c"):
+                    continue
+                if filename in ZFP.PARAMS.ignored_files:
+                    continue
+                # Get paht to each c source file
+                filepath = os.path.join(root, filename)
+                # Call method
+                method(filepath, *args)
+
+    def _remove_comments(self, filepath):
+        """
+        Comments might mess with later pipeline for identifying oneliner
+        """
+        cmd = "gcc -fpreprocessed -dD -E -P " + filepath
+        cmtless_src = shell_exec(cmd) 
+
+        with open(filepath, "w") as f: 
+            f.write(cmtless_src)
+
+    def _identify_oneliner(self, filepath):
+        """
+        Identify oneliner since they are problematic for our pipeline
+        """
+        oneliner_begins = ["for ", "while ", "if ", "else if ", "else "]
+
+        src_code = get_file_content(filepath, return_type="list")        
+        for i, line in enumerate(src_code):
+            oneliner_test = [line.find(o) for o in oneliner_begins]
+            # get index to first character of the oneliner
+            oneliner_index = next((i for i, x in enumerate(oneliner_test) if x!=-1), None)
+            if oneliner_index is not None:
+                # beginning of one-liner detected
+                
+                # identify opening brace "{"
+                # If keywords such as else, for, if, else, else if, while, "}" 
+                # is detected before the opening brace, then it is a one-liner
+
+                potential_oneliner_start = line[oneliner_index:]
+                
+                # last line of source code
+                if i == len(src_code)-1:  
+                    if "{" not in potential_oneliner_start:
+                        self.ignored_lines[os.path.basename(filepath)].append(i+1)
+                    break
+
+                # not last line of source code
+                lines_of_interest = src_code[i:] 
+                lines_of_interest[0] = potential_oneliner_start  # start search from where
+                                                                 # oneliner begins
+                oneliner_loc = 0
+                for ii,l in enumerate(lines_of_interest):
+                    openbrace_test = l.find("{")
+                    oneliner_find = l.find(";")
+                    if oneliner_find != -1:
+                        # first statement since oneliner start
+                        oneliner_loc = i+ii+1  # +1 to account for counting from 0
+
+                    # filter keywords_test of -1 since that is when find() fails
+                    keywords_test = filter(lambda x:x!=-1, 
+                                           [l.find(o) for o in oneliner_begins+["}"]])
+
+                    keywords = list(keywords_test)
+                    if keywords == list(): 
+                        # no keyword found
+                        if openbrace_test != -1:
+                            # not a oneliner! 
+                            break
+                    else: 
+                        if openbrace_test == -1:
+                            # found a keyword before "{". A oneliner
+                            self.ignored_lines[os.path.basename(filepath)].append(oneliner_loc) 
+                            break
+
+                        # a keyword and "{" are both found on current line
+                        # not a oneliner! EX: } else {
+                        break
+
+                    # end of loop reached if a keyword is not found and "{" is not found
 
     def _perform_injection(self):
         """
@@ -134,7 +226,7 @@ class ZFP:
         """
         Parse, beautify, and save Frama-C's value analysis result as JSON
         """
-        value_sets = framac_output_split(self._run_framac(), ZFP.PARAMS)
+        value_sets = framac_output_split(self._run_framac(), self.ignored_lines, ZFP.PARAMS)
 
         # Save value_sets result (dictionary) as json
         # object of type set is not JSON serializable 
@@ -215,7 +307,7 @@ if __name__ == "__main__":
     host_src_dir = sys.argv[1]
     set_configs(host_src_dir)
 
-    # Create tmp working dir
+    # Create tmp working dir (wdir)
     millis = int(round(time.time() * 1000))
     seed(millis)  # Make random() as random as possible
     wdir = os.path.join(configs["metadata_dir"], "zfp-"+str(random()))
