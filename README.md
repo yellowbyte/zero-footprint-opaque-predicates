@@ -21,6 +21,7 @@ Our inserted opaque predicates' obfuscation is a deterministic and impossible in
   * Make sure the folder containing target source code has the following additional files: 
     * `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. 
     * `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file.
+      * Our dependence on Frama-C also means that our tool cannot obfuscate code that contains recursive calls, [as it is a limitation of Frama-C](https://www.frama-c.com/fc-plugins/eva.html).
   * if the program crashes, check out [debugging\_tips.md](docs/debugging\_tips.md) for help
 
 #### Settings
@@ -41,8 +42,3 @@ User can specify the settings in a JSON file named "zfp.json" and place that fil
 ```
 
 User can also directly change the settings by updating the `configs` dictionary  at `src/utilities/__init__.py`
-
-## Other Notes and Pitfalls
-
-* Cannot obfuscate code that contains recursive calls. This is a limitation of one of our dependencies, Frama-C
-  * stated in [Frama-C's website under the "Technical Notes" section](https://www.frama-c.com/fc-plugins/eva.html).
