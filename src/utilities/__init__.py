@@ -37,6 +37,20 @@ configs = {
 }
 
 
+def set_configs(args):
+    """
+    Set `configs` based on commandline arguments `args`
+    """
+    global configs
+
+    if args.metadatadir:
+        configs["metadata_dir"] = args.metadatadir
+    if args.delmetadata:
+        configs["delete_metadata"] = args.delmetadata
+    if args.limits:
+        configs["value_set_limit"] = args.limits
+
+
 def shell_exec(cmd):
     """
     Run `cmd` in shell
