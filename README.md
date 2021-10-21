@@ -30,3 +30,7 @@ The followings are settings user can change:
 * `--metadatadir <path>`: path to directory where metadata will be stored. Default to /tmp
 * `--delmetadata` or `--no-delmetadata`: decides whether to delete the metadata folder. Default to True
 * `--limits <value>`: the max value set length to consider. Too small may lead to few synthesized opaque predicates. Too large may lead to crash. Default to 100000000
+
+```
+usage: python3.10 insert_ops.py [-h] [-m METADATADIR] [-l LIMITS] [--delmetadata | --no-delmetadata] srcfolder
+```
