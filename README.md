@@ -22,7 +22,7 @@ Currently, our inserted opaque predicates' obfuscation is a deterministic and im
 
 __NOTE__: Make sure the folder containing target source code has the following additional files: 
 * `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. [Here is a simple tutorial on how to write a Makefile](https://gist.github.com/yellowbyte/b2b61f547e51e80b30522a989e6ea88d).
-* `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file.
+* `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file. [Here is a simple tutorial on how to write the GNUmakefile](docs/framac_setup.md).
   * Our dependence on Frama-C also means that our tool cannot obfuscate code that contains recursive calls, [as it is a limitation of Frama-C](https://www.frama-c.com/fc-plugins/eva.html).
 
 #### Settings
