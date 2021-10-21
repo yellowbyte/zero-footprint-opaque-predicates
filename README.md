@@ -30,3 +30,5 @@ The followings are settings user can change:
 * `metadata_dir`: path to directory where metadata will be stored. Default to /tmp
 * `delete_metadata`: set to either True or False. Decides whether to delete the metadata folder. Default to True
 * `value_set_limit`: the max value set length to consider. Too small may lead to few synthesized opaque predicates. Too large may lead to crash. Default to 100000000
+
+For how to set them, check out the help menu: `python3.10 src/insert_ops.py -h`

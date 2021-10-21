@@ -306,10 +306,10 @@ def main(wdir, host_src_dir):
 if __name__ == "__main__":
     # Set configurations
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--metadatadir", type=str, required=False)
-    parser.add_argument("-l", "--limits", type=int, required=False)
+    parser.add_argument("-m", "--metadatadir", type=str, required=False, help="path to directory where metadata will be stored. Default to /tmp")
+    parser.add_argument("-l", "--limits", type=int, required=False, help="the max value set length to consider. Too small may lead to few synthesized opaque predicates. Too large may lead to crash. Default to 100000000")
     parser.add_argument('srcfolder', type=str, help="folder containing source code to obfuscate")
-    parser.add_argument("--delmetadata", action=argparse.BooleanOptionalAction, required=False)
+    parser.add_argument("--delmetadata", action=argparse.BooleanOptionalAction, required=False, help="set to either True or False. Decides whether to delete the metadata folder. Default to True")
     args = parser.parse_args()
     set_configs(args)
     host_src_dir = args.srcfolder
