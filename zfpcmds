@@ -33,7 +33,7 @@ zfpstart ()
 }
 
 # attach to container after detach
-zfpattach()
+zfpattach ()
 {
   docker exec -it zfp /bin/bash
 }
@@ -68,7 +68,7 @@ dockerfresh ()
 
 
 # count line numbers in file excluding comments and spaces
-countlines()
+countlines ()
 {
   # to remove blank lines: 
   # https://stackoverflow.com/questions/114814/count-non-blank-lines-of-code-in-bash
