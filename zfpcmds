@@ -10,18 +10,32 @@ zfpbuild ()
 # testing
 zfpstarttest ()
 {
-  docker run -t -d -v $(pwd)/scripts:/scripts -v $(pwd)/dataset:/dataset -v $(pwd)/src:/src --name zfp zfp
-  MAIN_ID=$(docker ps -qf "name=^zfp$")
-  docker exec -it $MAIN_ID /bin/bash  
+  if [ $# -eq 0 ]
+    then
+      echo "Need to supply relative path to folder containing code to obfuscate"
+  else
+    docker run -t -d -v $(pwd)/scripts:/scripts -v $(pwd)/${1}:/${1} -v $(pwd)/src:/src --name zfp zfp
+    docker exec -it zfp /bin/bash  
+  fi
 }
 
 # start analysis
 # production
 zfpstart ()
 {
-  docker run -t -d -v $(pwd)/scripts:/scripts -v $(pwd)/dataset:/dataset --name zfp zfp
-  MAIN_ID=$(docker ps -qf "name=^zfp$")
-  docker exec -it $MAIN_ID /bin/bash  
+  if [ $# -eq 0 ]
+    then
+      echo "Need to supply relative path to folder containing code to obfuscate"
+  else
+    docker run -t -d -v $(pwd)/scripts:/scripts -v $(pwd)/${1}:/${1} --name zfp zfp
+    docker exec -it zfp /bin/bash  
+  fi
+}
+
+# attach to container after detach
+zfpattach()
+{
+  docker exec -it zfp /bin/bash
 }
 
 # remove zfp metadata 
