@@ -6,4 +6,4 @@
 
 Suppose your single C file is called "simple.c", to automate renaming use this command: `sed -i 's/<filename>/simple/g' GNUmakefile`
 
-Frama-C has some knobs to turn that allows user to tune its analysis. We plan to make another tutorial that explains some of the knobs for tuning the analysis in the future.  
+Frama-C has some knobs to turn that allows user to tune its analysis. We plan to make another tutorial that explains some of those knobs in the future.  
