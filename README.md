@@ -27,10 +27,10 @@ __NOTE__: Make sure the folder containing target source code has the following a
 
 #### Settings
 The followings are settings user can change:
-* `--metadatadir <relative filepath>`: relative filepath to directory where metadata will be stored. Default to /tmp
+* `--metadatadir <filepath>`: filepath to directory where metadata will be stored. Default to /tmp
 * `--delmetadata` or `--no-delmetadata`: decides whether to delete the metadata folder. Default to True
 * `--limits <value>`: the max value set length to consider. Too small may lead to few synthesized opaque predicates. Too large may lead to crash. Default to 100000000
 
 ```
-usage: python3.10 src/insert_ops.py [-h] [-m <relative filepath>] [-l <value>] [--delmetadata | --no-delmetadata] [relative filepath to the folder containing target source code]
+usage: python3.10 src/insert_ops.py [-h] [-m <filepath>] [-l <value>] [--delmetadata | --no-delmetadata] [relative filepath to the folder containing target source code]
 ```
