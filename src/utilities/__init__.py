@@ -45,7 +45,8 @@ def set_configs(args):
 
     if args.metadatadir:
         configs["metadata_dir"] = args.metadatadir
-    if args.delmetadata:
+    if not args.delmetadata:
+        # by default True
         configs["delete_metadata"] = args.delmetadata
     if args.limits:
         configs["value_set_limit"] = args.limits

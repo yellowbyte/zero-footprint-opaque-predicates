@@ -305,13 +305,14 @@ def main(wdir, host_src_dir):
 
 if __name__ == "__main__":
     # Set configurations
-    host_src_dir = sys.argv[1]
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--metadatadir", type=str, required=False)
-    parser.add_argument("-d", "--delmetadata", type=bool, required=False)
     parser.add_argument("-l", "--limits", type=int, required=False)
+    parser.add_argument('srcfolder', type=str, help="folder containing source code to obfuscate")
+    parser.add_argument("--delmetadata", action=argparse.BooleanOptionalAction, required=False)
     args = parser.parse_args()
-    set_config(args)
+    set_configs(args)
+    host_src_dir = args.srcfolder
 
     # Create tmp working dir (wdir)
     millis = int(round(time.time() * 1000))
