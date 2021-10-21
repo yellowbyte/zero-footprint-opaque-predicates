@@ -32,5 +32,5 @@ The followings are settings user can change:
 * `--limits <value>`: the max value set length to consider. Too small may lead to few synthesized opaque predicates. Too large may lead to crash. Default to 100000000
 
 ```
-usage: python3.10 src/insert_ops.py [-h] [-m METADATADIR] [-l LIMITS] [--delmetadata | --no-delmetadata] srcfolder
+usage: python3.10 src/insert_ops.py [-h] [-m METADATADIR] [-l LIMITS] [--delmetadata | --no-delmetadata] [relative filepath to the folder containing target source code]
 ```
