@@ -1,3 +1,4 @@
--   repo: https://github.com/yellowbyte/zero-footprint-opaque-predicates
+-   repo: https://github.com/pycqa/flake8
+    rev: '3.9.2'  # pick a git hash / tag to point to
     hooks:
     -   id: flake8
