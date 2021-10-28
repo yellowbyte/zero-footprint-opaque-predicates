@@ -1,0 +1,3 @@
+-   repo: https://github.com/yellowbyte/zero-footprint-opaque-predicates
+    hooks:
+    -   id: flake8
