@@ -15,9 +15,9 @@ Currently, our inserted opaque predicates' obfuscation is a deterministic and im
 2. zfpbuild (will build a Docker image that contains everything you needed to run this tool)
 
 #### To Run (assumed you ran `source zfpcmds`)
-* zfpstart [relative filepath to the folder containing target source code] 
+* zfpstart <relative filepath to the folder containing target source code>
   * This command will drop you inside the Docker container.
-* python3.10 src/insert\_ops.py [relative filepath to the folder containing target source code]
+* python3.10 src/insert\_ops.py <relative filepath to the folder containing target source code>
   * If the program crashes, check out [debugging\_tips.md](docs/debugging\_tips.md) for help.
 
 __NOTE__: Make sure the folder containing target source code has the following additional files: 
@@ -32,5 +32,5 @@ The followings are settings user can change:
 * `--limits <value>`: the max value set length to consider. Too small may lead to few synthesized opaque predicates. Too large may lead to crash. Default to 100000000
 
 ```
-usage: python3.10 src/insert_ops.py [-h] [-m <filepath>] [-l <value>] [--delmetadata | --no-delmetadata] [relative filepath to the folder containing target source code]
+usage: python3.10 src/insert_ops.py [-h] [-m <filepath>] [-l <value>] [--delmetadata | --no-delmetadata] <relative filepath to the folder containing target source code>
 ```
