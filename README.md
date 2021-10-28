@@ -11,10 +11,10 @@ Currently, our inserted opaque predicates' obfuscation is a deterministic and im
 * Linux
 
 #### Installation (assumed in project root directory)
-1. source zfpcmds
+1. source scripts/zfpcmds
 2. zfpbuild (will build a Docker image that contains everything you needed to run this tool)
 
-#### To Run (assumed you ran `source zfpcmds`)
+#### To Run (assumed you ran `source scripts/zfpcmds`)
 * zfpstart \<relative filepath to the folder containing target source code\>
   * This command will drop you inside the Docker container.
 * python3.10 src/insert\_ops.py \<relative filepath to the folder containing target source code\>

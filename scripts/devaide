@@ -1,0 +1,27 @@
+#!/bin/bash
+
+### Docker 
+# detach from container terminal: Ctrl-P and Ctrl-Q
+# how to de-attach: https://stackoverflow.com/questions/19688314/how-do-you-attach-and-detach-from-dockers-process
+
+### Flake8
+# pretty print number of violations:
+#     flake8 --statistics src/*
+# all locations of a specific violation:
+#     flake8 --select W293 src/* 
+
+# count line numbers in file excluding comments and spaces
+countlines ()
+{
+  # to remove blank lines: 
+  # https://stackoverflow.com/questions/114814/count-non-blank-lines-of-code-in-bash
+  # to remove C comments:
+  # https://unix.stackexchange.com/questions/317795/remove-comments-in-a-c-file
+  perl -0777 -pe 's,/\*.*?\*/,,gs' ${1} | sed '/^\s*$/d' | wc -l
+}
+
+# delete trailing whitespaces from a file
+trailingno ()
+{
+  sed --in-place 's/[[:space:]]\+$//' ${1}
+}

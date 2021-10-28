@@ -62,17 +62,3 @@ dockerfresh ()
 {
   sudo systemctl restart docker.socket docker.service
 }
-
-# detach from container terminal: Ctrl-P and Ctrl-Q
-# how to de-attach: https://stackoverflow.com/questions/19688314/how-do-you-attach-and-detach-from-dockers-process
-
-
-# count line numbers in file excluding comments and spaces
-countlines ()
-{
-  # to remove blank lines: 
-  # https://stackoverflow.com/questions/114814/count-non-blank-lines-of-code-in-bash
-  # to remove C comments:
-  # https://unix.stackexchange.com/questions/317795/remove-comments-in-a-c-file
-  perl -0777 -pe 's,/\*.*?\*/,,gs' ${1} | sed '/^\s*$/d' | wc -l
-}
