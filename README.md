@@ -25,7 +25,7 @@ Currently, our inserted opaque predicates' obfuscation is a deterministic and im
 [Option 3]: `python3 zfp.py <filepath to the folder containing target source code>`
 * This option allows user to use this tool without leveraging our container given that Frama-C, Rosette, jq, and Python version 3.10 or greater are installed.
 
-The obfuscated binary will be placed in \<filepath to the folder containing target source code\>.
+For either one of the three options, the obfuscated binary will be placed in \<filepath to the folder containing target source code\>.
 
 __NOTE__: Make sure the folder containing target source code has the following additional files: 
 * `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. [Here is a simple tutorial on how to write a Makefile](https://gist.github.com/yellowbyte/b2b61f547e51e80b30522a989e6ea88d).
