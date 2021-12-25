@@ -8,28 +8,76 @@ zfpbuild ()
 
 # start analysis
 # testing
-zfpstarttest ()
+zfptest ()
 {
   if [ $# -eq 0 ]
     then
-      echo "Need to supply relative path to folder containing code to obfuscate"
+      echo "Need to supply path to folder containing code to obfuscate"
   else
-    docker run -t -d -v $(pwd)/scripts:/scripts -v $(pwd)/${1}:/${1} -v $(pwd)/src:/src --name zfp zfp
-    docker exec -it zfp /bin/bash  
+    if [[ ${1} == /* ]]
+      then
+	# absolute filepath provided as argument
+        filepath=${1%/}
+    else
+      # relative filepath provided as argument
+      filepath=$(pwd)/${1%/}
+    fi
+
+    # container action
+    docker run -t -d -v $(pwd):/zfp -v ${filepath}:/tmp/${filepath##*/}/ --name zfp zfp
+    docker exec -it zfp ln -sf /usr/bin/python3.10 /usr/bin/python3
+    docker exec -it zfp bash -c 'cd /zfp; exec "${SHELL:-sh}"' 
   fi
 }
 
 # start analysis
 # production
-zfpstart ()
+zfp ()
 {
+  # commandline argument parsing 
+  # -m, --delmetadata, --no-delmetadata are irrelevant when running `zfp`
+  # if you want info regarding metadata, use `zfptest`
+  args=""
+  while true; do
+    case "$1" in
+      -h | --help ) args+="--help "; shift; break ;;
+      -m | --metadatadir ) args+="--metadatadir ${2} "; shift 2 ;;
+      -l | --limits ) args+="--limits ${2} "; shift 2 ;;
+      --delmetadata ) args+="--delmetadata "; shift ;;
+      --no-delmetadata ) args+="--no-delmetadata "; shift ;;
+      -- ) shift; break ;;
+      * ) break ;;  # no argument
+    esac
+  done
+
   if [ $# -eq 0 ]
     then
-      echo "Need to supply relative path to folder containing code to obfuscate"
+      echo "Need to supply path to folder containing code to obfuscate"
   else
-    docker run -t -d -v $(pwd)/scripts:/scripts -v $(pwd)/${1}:/${1} --name zfp zfp
-    docker exec -it zfp /bin/bash  
+    if [[ ${1} == /* ]]
+      then
+	# absolute filepath provided as argument
+        filepath=${1%/}
+    else
+      # relative filepath provided as argument
+      filepath=$(pwd)/${1%/}
+    fi
+
+    # container action
+    # mount the folder containing the obfuscation source, not including the path
+    docker run -t -d -v ${filepath}:/zfp/${filepath##*/}/ --name zfp zfp
+    docker exec -it zfp ln -sf /usr/bin/python3.10 /usr/bin/python3
+    docker exec -it zfp python3 /zfp/zfp.py  ${args} /zfp/${filepath##*/}/
+    echo "Obfuscation Completed. Delete Container:"
+    zfpstop
   fi
+}
+
+# stop analysis
+zfpstop ()
+{
+  docker stop $(docker ps -q --filter ancestor=zfp)
+  docker rm $(docker ps -qa --filter ancestor=zfp)
 }
 
 # attach to container after detach
@@ -42,23 +90,4 @@ zfpattach ()
 zfprm ()
 {
   rm -rf zfp-0.*
-}
-
-# remove all stopped containers
-dockerrm ()
-{
-  docker rm $(docker ps -a -q)
-}
-# stop and remove all running docker containers
-dockerclean ()
-{
-  docker stop $(docker ps -a -q)
-  docker rm $(docker ps -a -q)
-}
-
-# restart docker
-# https://stackoverflow.com/questions/31365827/cannot-stop-or-restart-a-docker-container
-dockerfresh ()
-{
-  sudo systemctl restart docker.socket docker.service
 }

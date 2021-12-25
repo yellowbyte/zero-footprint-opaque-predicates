@@ -8,43 +8,27 @@ USER root
 
 ### Install common necessary packages
 RUN apt-get clean
-RUN apt-get -y update && DEBIAN_FRONTEND=noninteractive apt-get -y install python3 python3-pip git 
+RUN apt-get -y update && DEBIAN_FRONTEND=noninteractive apt-get -y install python3 python3-pip
 RUN apt-get install -y build-essential && \
     apt-get update && \
-    apt-get install -y vim \
-                       libgmp-dev \
-                       tar \
-                       perl \
-                       pkg-config \
-                       autoconf \
-                       automake \
-                       graphviz \
+    apt-get install -y pkg-config \
+                       software-properties-common \
                        libgnomecanvas2-dev \
                        libgtksourceview2.0-dev \
+                       gcc-multilib \
+                       g++-multilib \
                        libgtk-3-dev \
-                       m4 \
-	               make \
-                       cmake \
-                       flex \
-                       libboost-all-dev \
-                       libboost-dev \
-                       libboost-test-dev \
-                       libboost-system-dev \
-                       libc6 \
                        libc6-dev \
                        libstdc++6 \
-                       llvm \
-                       llvm-dev \
-                       gcc-multilib \
-	               gcc \
                        libffi-dev \
                        libz-dev \
-                       software-properties-common \
-                       clang \
-                       jq \
-                       wget \
-                       time \
                        zlib1g-dev \
+                       libc6 \
+                       clang \
+                       wget \
+                       vim \
+                       gdb \
+                       jq \
                        opam
 
 ### Install Rosette (Racket)
@@ -58,9 +42,6 @@ RUN raco setup
 RUN raco pkg install custom-load
 RUN raco pkg install rfc6455
 RUN raco pkg install rosette
-# Get Rosette code
-COPY ./tools/rosette/synthesize.rkt /synthesis/
-COPY ./tools/rosette/perform_synthesis.sh /synthesis/
 
 ###  Install Frama-C
 RUN opam init --disable-sandboxing --shell-setup
@@ -78,8 +59,6 @@ ENV OCAML_TOPLEVEL_PATH='/root/.opam/default/lib/toplevel'
 ENV PKG_CONFIG_PATH='/root/.opam/default/lib/pkgconfig'
 ENV MANPATH=':/root/.opam/default/man'
 ENV PATH='/root/.opam/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-COPY ./tools/frama-c/prettyvsa.ml / 
-COPY ./src /src
 
 ### Install Python 3.10
 RUN apt update
@@ -87,8 +66,11 @@ RUN apt install software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt -y install python3.10
 
-# since my tool assume this working directory
-WORKDIR /
+### Move obfuscation tool to container
+RUN mkdir /zfp
+COPY ./core /zfp/core
+COPY ./zfp.py /zfp/zfp.py
+COPY ./tools /zfp/tools
 
-
-
+# since the tool assume this working directory
+WORKDIR /zfp

@@ -6,4 +6,6 @@
 
 Suppose your single C file is called "simple.c", to automate renaming use this command: `sed -i 's/<filename>/simple/g' GNUmakefile`
 
+If you are running this tool without using our container, you will also have to change the argument to `-load-script` to the absolute filepath that points to `prettyvsa.ml` on your machine. `prettyvsa.ml` is relative to the root of this project: `tools/frama-c/prettyvsa.ml`. 
+
 Frama-C has some knobs to turn that allows user to tune its analysis. We plan to make another tutorial that explains some of those knobs in the future.  

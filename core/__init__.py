@@ -1,38 +1,22 @@
-"""MAIN."""
-import argparse
 import json
-import logging
 import os
-import shutil
-import sys
-import time
-import traceback
-from collections import defaultdict, namedtuple
-from datetime import timedelta
-from random import random, seed
+
 from time import perf_counter
 
-from utilities import (configs, framac_output_split, get_file_content,
-                       set_configs, shell_exec)
+from collections import defaultdict, namedtuple
 
-# Logging
-logger = logging.getLogger('')
-logger.setLevel(logging.DEBUG)
+from .utilities import (get_configs, framac_output_split, get_file_content,
+                       shell_exec, parse_args)
 
 
-class ZFP:
+class Zfp:
     """Class to construct zero footprint opaque predicates in src code."""
 
     PARAMS_STRUCT = namedtuple('PARAMS_STRUCT',
                                ('obfuscation framac_vars ignored_files '
                                 'ignored_functions value_set_limit'))
-    PARAMS = PARAMS_STRUCT(configs['obfuscation'],
-                           configs['framac_vars'],
-                           configs['ignored_files'],
-                           configs['ignored_functions'],
-                           configs['value_set_limit'])
 
-    def __init__(self, wdir):
+    def __init__(self, wdir, configs):
         """Init variables and perform obfuscation.
 
         Args:
@@ -49,6 +33,12 @@ class ZFP:
         self.framac_runtime = 0
         self.line_nums = 0
         self.op_nums = 0
+
+        self.params = Zfp.PARAMS_STRUCT(configs['obfuscation'],
+                                    configs['framac_vars'],
+                                    configs['ignored_files'],
+                                    configs['ignored_functions'],
+                                    configs['value_set_limit'])
 
         # ~~~ main operations ~~~
         # (0) Pre-Process or Remove Comments
@@ -96,7 +86,7 @@ class ZFP:
             for filename in files:
                 if not filename.endswith('.c'):
                     continue
-                if filename in ZFP.PARAMS.ignored_files:
+                if filename in self.params.ignored_files:
                     continue
                 # Get paht to each c source file
                 filepath = os.path.join(root, filename)
@@ -199,6 +189,13 @@ class ZFP:
             src_code = get_file_content(os.path.join(self.wdir, filepath),
                                         return_type='list')
             for line_number, ops in self.opaque_predicates[filepath].items():
+                if not src_code[int(line_number)-1].isspace():
+                    # make sure to insert at end of an instruction 
+                    # signify by ';', '}', '{'
+                    if src_code[int(line_number)-1].rstrip()[-1] not in  \
+                            (';', '}', '{'):
+                        continue
+
                 for op in ops:
                     self.op_nums += 1
                     src_code[int(line_number)-1] += op
@@ -213,7 +210,7 @@ class ZFP:
             opaque expressions (ex: y > 10)
         """
         # Run Rosette
-        cmd = '/synthesis/perform_synthesis.sh '+self.vsa_json
+        cmd = 'tools/rosette/perform_synthesis.sh '+self.vsa_json
         opaque_expressions = shell_exec(cmd)
         return opaque_expressions
 
@@ -249,11 +246,11 @@ class ZFP:
             if opaqueness == 't':
                 content[loc].append(('if('+var+' '+comparator+' '+constant
                                     + '){goto '+label+';}'
-                                    + ZFP.PARAMS.obfuscation.format(index)
+                                    + self.params.obfuscation.format(index)
                                     + label+':'))
             elif opaqueness == 'f':
                 content[loc].append(('if('+var+' '+comparator+' '+constant+'){'
-                                    + ZFP.PARAMS.obfuscation.format(index)+'}'))
+                                    + self.params.obfuscation.format(index)+'}'))
             index += 1
 
         return opaque_predicates
@@ -266,7 +263,7 @@ class ZFP:
         """
         value_sets = framac_output_split(self._run_framac(),
                                          self.ignored_lines,
-                                         ZFP.PARAMS)
+                                         self.params)
 
         # Save value_sets result (dictionary) as json
         # object of type set is not JSON serializable
@@ -289,119 +286,3 @@ class ZFP:
         time_after = perf_counter()
         self.framac_runtime = time_after-time_before
         return framac_raw_output
-
-
-def main(wdir, host_src_dir):
-    """Perform Main.
-
-    Args:
-        wdir: working directory
-        host_src_dir: orginal directory that contains the code to obfuscate
-
-    Return:
-        None
-    """
-    try:
-        timer_start = perf_counter()
-        obfuscated = ZFP(wdir)
-        timer_stop = perf_counter()
-    except:  # noqa
-        # Remove tmp working dir
-        if configs['delete_metadata']:
-            shutil.rmtree(wdir)
-        sys.exit(str(traceback.format_exc()))
-
-    # Compile the obfuscated source code
-    shell_exec(' make -C '+wdir+' -f Makefile')
-
-    # Statistics
-    logging.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-    logging.info('current: '
-                 + host_src_dir)
-    logging.info('number of value sets identified: '
-                 + str(len(obfuscated.value_sets.keys())))
-    logging.info('number of opaque predicates: '
-                 + str(obfuscated.op_nums))
-    logging.info('time it takes to obfuscate (seconds): '
-                 + str(timer_stop-timer_start))
-    logging.info('time it takes to obfuscate (formatted): '
-                 + str(timedelta(seconds=(timer_stop-timer_start))))
-    logging.info('Frama-C runtime (seconds): '
-                 + str(obfuscated.framac_runtime))
-    logging.info('Frama-C runtime (formatted): '
-                 + str(timedelta(seconds=(obfuscated.framac_runtime))))
-
-    # Move the compiled binary to original directory
-    # Copy back everything except C files, zfp.log and vsa.json.
-    # C files are modified by this tool (with OP added in)
-    # zfp.log in wdir is the old log
-    for subdir, _, files in os.walk(wdir):
-        for _file in files:
-            if _file.endswith('.c'):
-                continue
-            if _file == 'vsa.json':
-                continue
-            if _file == 'zfp.log':
-                continue
-            # analysis results from Frama-C. Don't need
-            # or else can't rerun unless user manually delete these folders
-            if subdir.endswith('.eva'):
-                continue
-            if subdir.endswith('.parse'):
-                continue
-
-            relative_filepath = os.path.relpath(subdir, wdir)
-            shutil.move(os.path.join(wdir, relative_filepath, _file),
-                        os.path.join(host_src_dir, relative_filepath, _file))
-
-
-if __name__ == '__main__':
-    # Set configurations
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-m',
-                        '--metadatadir',
-                        type=str,
-                        required=False,
-                        help=('path to directory where metadata will be stored.'
-                              'Default to /tmp'))
-    parser.add_argument('-l',
-                        '--limits',
-                        type=int,
-                        required=False,
-                        help=('the max value set length to consider.'
-                              'Too small may lead to few synthesized opaque'
-                              'predicates. Too large may lead to crash.'
-                              'Default to 100000000'))
-    parser.add_argument('srcfolder',
-                        type=str,
-                        help='folder containing source code to obfuscate')
-    parser.add_argument('--delmetadata',
-                        action=argparse.BooleanOptionalAction,
-                        required=False,
-                        help=('set to either True or False. Decides whether to'
-                              'delete the metadata folder. Default to True'))
-    args = parser.parse_args()
-    set_configs(args)
-    host_src_dir = args.srcfolder
-
-    # Create tmp working dir (wdir)
-    millis = int(round(time.time() * 1000))
-    seed(millis)  # Make random() as random as possible
-    wdir = os.path.join(configs['metadata_dir'],
-                        'zfp-'+str(random()))  # noqa:S311
-    shutil.copytree(host_src_dir, wdir)
-
-    # Set up logging
-    fh = logging.FileHandler(os.path.join(host_src_dir, 'zfp.log'), mode='w')
-    fh.setLevel(logging.INFO)
-    sh = logging.StreamHandler()
-    sh.setLevel(logging.DEBUG)
-    logger.addHandler(fh)
-    logger.addHandler(sh)
-
-    # Main
-    main(wdir, host_src_dir)
-
-    # Remove tmp working dir
-    if configs['delete_metadata']:
-        shutil.rmtree(wdir)

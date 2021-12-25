@@ -1,0 +1,127 @@
+#!/bin/bash
+
+
+# perform the obfuscation
+zfp_main()
+{
+    for filepath in ${1}/*/; do
+	echo ${filepath}
+        zfp ${filepath}
+    done
+}
+
+# find all the inserted OP from the obfuscation (non-executable code)
+zfp_identify()
+{
+    for filepath in ${1}/*/; do
+        echo ${filepath}
+        exe=$(find ${filepath} -executable -type f ! -name "*.orig" ! -name "*.sh")  # return relative path
+        python3 scripts/identify_zfp.py ${exe} > ${filepath}op_locations.zfp
+    done
+}
+
+# create dir for deobfuscation and binary vsa eval
+zfp_evaldir()
+{
+    for filepath in ${1}/*/; do
+        echo ${filepath}
+        mkdir ${filepath}/deobf
+        mkdir ${filepath}/vsa
+    done
+}
+
+############################################################################################################################################
+# deobfuscation with OpaquePredicatePatcher (binja)
+zfp_opaquepredicatepatcher()
+{
+    for filepath in ${1}/*/; do
+        echo ${filepath}
+        exe=$(find ${filepath} -executable -type f ! -name "*.orig" ! -name "*.sh")  # return relative path
+        python3 -mOpaquePredicatePatcher.__main__ ${exe} | grep -Ev "^(Analysis|start)" > ${filepath}/deobf/opaquepredicatepatcher.zfp
+    done
+}
+
+# deobfuscation with BINSEC
+zfp_binsec()
+{
+    # NOTE: you may have to change the BINSEC docker image version based on which one is installed on your machine
+    # binsec-0.3 is the newest version at the time of experiment
+    touch tmp.zfp
+    docker run -t -d -v $(pwd)/dataset:/home/binsec/dataset --name binsec binsec/binsec-0.3:v1
+    BINSEC_ID=$(docker ps -qf "name=^binsec$")
+    for filepath in ${1}/*/; do
+        echo ${filepath}
+        exe=$(find ${filepath} -executable -type f ! -name "*.orig" ! -name "*.sh")  # return relative path
+        docker exec -it $BINSEC_ID binsec -bw -bw-opaque -bw-k 16 ${exe} > tmp.zfp
+        cat tmp.zfp | grep "is opaque" | awk '{ print $6 }' > ${filepath}deobf/binsec.zfp
+        docker exec -it $BINSEC_ID binsec -bw -bw-opaque -bw-k 12 ${exe} > tmp.zfp
+        cat tmp.zfp | grep "is opaque" | awk '{ print $6 }' > ${filepath}deobf/binsec-12.zfp
+        docker exec -it $BINSEC_ID binsec -bw -bw-opaque -bw-k 20 ${exe} > tmp.zfp
+        cat tmp.zfp | grep "is opaque" | awk '{ print $6 }' > ${filepath}deobf/binsec-20.zfp
+        docker exec -it $BINSEC_ID binsec -bw -bw-opaque -bw-k 24 ${exe} > tmp.zfp
+        cat tmp.zfp | grep "is opaque" | awk '{ print $6 }' > ${filepath}deobf/binsec-24.zfp
+
+    done
+    docker rm -f $BINSEC_ID
+    rm tmp.zfp
+}
+
+# get eval for how well the tool (e.g., opaquepredicatepatcher, binsec) deobfuscation performs
+# Arg 2 (Type):
+# * opaquepredicatepatcher
+# * binsec
+zfp_eval()
+{
+    for filepath in ${1}/*/; do
+        echo ${filepath}
+        python scripts/perform_eval.py ${filepath}/op_locations.zfp ${filepath}deobf/${2}.zfp > ${filepath}deobf/eval_${2}.zfp
+    done
+}
+
+# get eval for how well the binary-level abstract interpretation performs
+# Arg 2 (Type):
+# * binja
+zfp_eval2()
+{
+    for filepath in ${1}/*/; do
+        echo ${filepath}
+        python scripts/perform_eval.py ${filepath}/op_locations.zfp ${filepath}vsa/${2}.zfp > ${filepath}vsa/eval_${2}.zfp
+    done
+}
+############################################################################################################################################
+
+# produce summary on benchmark in one file 
+# Arg 2 (Type): 
+# * op_locations.zfp
+# * time.zfp
+# * deobf/opaquepredicatepatcher.zfp
+# * deobf/eval_opaquepredicatepatcher.zfp
+# * deobf/binsec.zfp
+# * deobf/eval_binsec.zfp
+# * vsa/binja.zfp
+# * vsa/eval_binja.zfp
+zfp_summary()
+{
+    summary=$(basename ${2})
+    rm ${summary}
+    touch ${summary}
+    for filepath in ${1}/*/; do
+        echo "############################################################" >> ${summary}
+        echo ${filepath}${2} >> ${summary}
+        echo "############################################################" >> ${summary}
+        cat ${filepath}/${2} >> ${summary}
+    done
+}
+
+# compile the original binary
+zfp_ogcreate()
+{
+    for filepath in ${1}/*/; do
+        echo ${filepath}
+        pushd ${filepath}
+        make -f MakefileOrig
+        popd
+    done
+}
+
+

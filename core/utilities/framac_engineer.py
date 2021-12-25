@@ -38,6 +38,7 @@ def framac_output_split(framac_out, ignored_lines, params):
     prettyvsa_output = prettyvsa_output.split("----------")[:-1]
 
     for value_sets_at_loc in prettyvsa_output:
+
         value_sets_nonewline = value_sets_at_loc.replace("\n", "")
         end_of_metadata_index = value_sets_nonewline.find("END_OF_METADATA")
         # metadata contains instruction, filename, and line number

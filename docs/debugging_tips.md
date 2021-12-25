@@ -1,6 +1,8 @@
 ## Python Exception? 
 
-To assist debugging, set `--no-delmetadata`.
+Run our program using `zfptest` instead of `zfp`. This allows user to inspect the metadata.
+
+Also, set `--no-delmetadata` or else metadata will be deleted.
 
 Look inside the metadata folder (folder name will always start with "zfp-"): 
 * Did a ".eva" folder get generated? If not, check that your GNUmakefile actually runs correctly

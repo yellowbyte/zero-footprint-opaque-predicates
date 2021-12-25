@@ -1,15 +1,18 @@
 """Contains general utilities functions and global configs."""
 import logging
+import argparse
 import subprocess  # noqa
 
 from .framac_engineer import *  # noqa
 
 # Configurations
 ######################
-configs = {
+__CONFIGS = {
     'metadata_dir': '/tmp',  # noqa
 
     'delete_metadata': True,
+
+    'srcfolder': None,
 
     # Obfuscation for the inserted opaque predicates
     # We purposely make it deterministic so we can detect our
@@ -37,6 +40,44 @@ configs = {
 }
 
 
+def parse_args():
+    """
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-m',
+                        '--metadatadir',
+                        type=str,
+                        required=False,
+                        help=('path to directory where metadata will be stored.'
+                              'Default to /tmp'))
+    parser.add_argument('-l',
+                        '--limits',
+                        type=int,
+                        required=False,
+                        help=('the max value set length to consider.'
+                              'Too small may lead to few synthesized opaque'
+                              'predicates. Too large may lead to crash.'
+                              'Default to 100000000'))
+    parser.add_argument('srcfolder',
+                        type=str,
+                        help='folder containing source code to obfuscate')
+    parser.add_argument('--delmetadata',
+                        action=argparse.BooleanOptionalAction,
+                        required=False,
+                        help=('set to either True or False. Decides whether to'
+                              'delete the metadata folder. Default to True'))
+    args = parser.parse_args()
+    # Set configurations
+    set_configs(args)
+
+
+def get_configs():
+    """
+    """
+    global __CONFIGS
+    return __CONFIGS
+
+
 def set_configs(args):
     """Set `configs` based on commandline arguments `args`.
 
@@ -46,15 +87,17 @@ def set_configs(args):
     Return:
         None
     """
-    global configs
+    global __CONFIGS
+
+    __CONFIGS['srcfolder'] = args.srcfolder
 
     if args.metadatadir:
-        configs['metadata_dir'] = args.metadatadir
-    if not args.delmetadata:
+        __CONFIGS['metadata_dir'] = args.metadatadir
+    if args.delmetadata is False:
         # by default True
-        configs['delete_metadata'] = args.delmetadata
+        __CONFIGS['delete_metadata'] = False
     if args.limits:
-        configs['value_set_limit'] = args.limits
+        __CONFIGS['value_set_limit'] = args.limits
 
 
 def shell_exec(cmd):

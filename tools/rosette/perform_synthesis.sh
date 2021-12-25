@@ -8,6 +8,7 @@ do
     vsas[$key]="$value"
 done < <(jq -r "to_entries|map(\"\(.key)=\(.value)\")|.[]" $1)
 
+
 # iterate each key in dictionary to try to synthesize an oapque predicate for it
 # each key is of this format: loc:var_name
 for key in "${!vsas[@]}"
@@ -16,7 +17,7 @@ do
     cur_vsa=$(echo "${vsas[$key]//,/ }" | tr -d '[],')
 
     # identify opaque predicate that always evaluate to false
-    result=$(racket /synthesis/synthesize.rkt f ${cur_vsa})
+    result=$(racket ./tools/rosette/synthesize.rkt f ${cur_vsa})
     if test "${result}" != "unsat"
     then
         comparator=$(echo ${result} | tr -d '()' | awk '{print $3}')
@@ -35,7 +36,7 @@ do
 
     # if no opaquely falase predicate, identify opaque predicate that
     # always evaluate to true instead
-    result=$(racket /synthesis/synthesize.rkt t ${cur_vsa})
+    result=$(racket ./tools/rosette/synthesize.rkt t ${cur_vsa})
     if test "${result}" != "unsat"
     then
         comparator=$(echo ${result} | tr -d '()' | awk '{print $3}')

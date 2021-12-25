@@ -25,7 +25,7 @@ EVAFLAGS    += \
   -eva-no-alloc-returns-null \
   -eva-slevel 100 \
   -eva-auto-loop-unroll 300 \
-  -load-script /prettyvsa.ml \
+  -load-script /zfp/tools/frama-c/prettyvsa.ml \
 
 ## GUI-only flags
 FCGUIFLAGS += \
