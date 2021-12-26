@@ -47,7 +47,8 @@ The option `-h` or `--help` will also give user information on the settings.
 yellowbyte:~/zero-footprint-opaque-predicates$ source scripts/zfpcmds 
 yellowbyte:~/zero-footprint-opaque-predicates$ zfp --limits 30000 ./dataset/01_simple_if
 ...
-
+```
+```bash
 ### [Option 2]: with `zfptest`
 yellowbyte:~/zero-footprint-opaque-predicates$ source scripts/zfpcmds 
 yellowbyte:~/zero-footprint-opaque-predicates$ zfptest ./dataset/01_simple_if
@@ -57,7 +58,8 @@ root@dfe5e978cd2b:/zfp# python3 zfp.py --no-delmetadata /tmp/01_simple_if
 root@dfe5e978cd2b:/zfp# exit
 # zfpstop to stop and remove container
 yellowbyte:~/zero-footprint-opaque-predicates$ zfpstop
-
+```
+```bash
 ### [Option 3]: running without using our container
 yellowbyte:~/zero-footprint-opaque-predicates$ python3 zfp.py --no-delmetadata ./dataset/01_simple_if
 ...
