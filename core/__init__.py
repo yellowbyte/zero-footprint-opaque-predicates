@@ -127,60 +127,57 @@ class Zfp:
                 (i for i, x in enumerate(oneliner_test) if x != -1),
                 None,
             )
-            if oneliner_index is not None:
-                # beginning of one-liner detected
+            if oneliner_index is None:
+                continue
 
-                # identify opening brace "{"
-                # If keywords such as else, for, if, else, else if, while, "}"
-                # is detected before the opening brace, then it is a one-liner
+            # beginning of one-liner detected
+            # identify opening brace "{"
+            # If keywords such as else, for, if, else, else if, while, "}"
+            # is detected before the opening brace, then it is a one-liner
+            potential_oneliner_start = line[oneliner_index:]
 
-                potential_oneliner_start = line[oneliner_index:]
+            # last line of source code
+            if i == len(src_code)-1:
+                if '{' not in potential_oneliner_start:
+                    basename = os.path.basename(filepath)
+                    self.ignored_lines[basename].append(i+1)
+                break
 
-                # last line of source code
-                if i == len(src_code)-1:
-                    if '{' not in potential_oneliner_start:
-                        basename = os.path.basename(filepath)
-                        self.ignored_lines[basename].append(i+1)
+            # not last line of source code
+            lines_of_interest = src_code[i:]
+            # start search from where oneliner begins
+            lines_of_interest[0] = potential_oneliner_start
+
+            oneliner_loc = 0
+            for ii, l in enumerate(lines_of_interest):
+                # iterate if a keyword and "{" is not found
+                openbrace_test = l.find('{')
+                oneliner_find = l.find(';')
+                if oneliner_find != -1:
+                    # first statement since oneliner start
+                    # +1 to account for counting from 0
+                    oneliner_loc = i+ii+1
+
+                # filter keywords_test of -1 since that is when find() fails
+                keywords = filter(
+                        lambda x: x != -1,
+                        [l.find(o) for o in oneliner_begins+['}']],
+                )
+
+                if not keywords and openbrace_test != -1:
+                    # empty list
+                    # no keyword found
+                    # not a oneliner!
                     break
-
-                # not last line of source code
-                lines_of_interest = src_code[i:]
-                # start search from where oneliner begins
-                lines_of_interest[0] = potential_oneliner_start
-
-                oneliner_loc = 0
-                for ii, l in enumerate(lines_of_interest):
-                    openbrace_test = l.find('{')
-                    oneliner_find = l.find(';')
-                    if oneliner_find != -1:
-                        # first statement since oneliner start
-                        # +1 to account for counting from 0
-                        oneliner_loc = i+ii+1
-
-                    # filter keywords_test of -1 since that is when find() fails
-                    keywords = filter(
-                            lambda x: x != -1,
-                            [l.find(o) for o in oneliner_begins+['}']],
-                    )
-
-                    if not keywords:
-                        # empty list
-                        # no keyword found
-                        if openbrace_test != -1:
-                            # not a oneliner!
-                            break
-                    else:
-                        if openbrace_test == -1:
-                            # found a keyword before "{". A oneliner
-                            (self.ignored_lines[os.path.basename(filepath)]
-                             .append(oneliner_loc))
-                            break
-
-                        # a keyword and "{" are both found on current line
-                        # not a oneliner! EX: } else {
+                else:
+                    if openbrace_test == -1:
+                        # found a keyword before "{". A oneliner
+                        (self.ignored_lines[os.path.basename(filepath)]
+                         .append(oneliner_loc))
                         break
-
-                    # end of loop reached if a keyword and "{" is not found
+                    # a keyword and "{" are both found on current line
+                    # not a oneliner! EX: } else {
+                    break
 
     def _perform_injection(self):
         """Insert synthesized opaque predicates back to source."""

@@ -7,7 +7,6 @@ This is the entry point for the ZFP obfuscation tool.
 import logging
 import os
 import shutil
-import sys
 import time
 from datetime import timedelta
 from random import random, seed

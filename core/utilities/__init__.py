@@ -21,13 +21,13 @@ __CONFIGS = {
     # Or else it can be easily detected from the obfuscation.
     'obfuscation': '__asm__ __volatile__(\"xor %eax, %eax;xor %esp, %esp;xor %ebp, %ebp; add %eax, %esp;\");',  # noqa
 
-    # NOTE: python can only hold so many values in-memory.
-    #       Higher "value_set_limit" allows you to possibly generate
-    #       more opaque predicates but will also slow down program or
-    #       worst-case, prematurely terminate it.
-    'value_set_limit': 100000000,  # we found this value to work well for our
-                                   # benchmark. Can choose a larger value.
-    # However, if program terminates prematurely, choose a smaller value (10000)
+    # Python can only hold so many values in-memory.
+    # Higher "value_set_limit" allows you to possibly generate
+    # more opaque predicates but will also slow down program or
+    # worst-case, prematurely terminate it.
+    'value_set_limit': 10000,  # we found this value to work well for our
+                               # benchmark. Can choose a larger value.
+    # However, if program terminates prematurely, choose a smaller value.
 
     # Specific to running Frama-C
     'framac_macro': 'Frama_C_show_each_',
@@ -41,8 +41,7 @@ __CONFIGS = {
 
 
 def parse_args():
-    """
-    """
+    """Parse commandline arguments and set global configurations accordingly."""
     parser = argparse.ArgumentParser()
     parser.add_argument('-m',
                         '--metadatadir',
@@ -72,8 +71,7 @@ def parse_args():
 
 
 def get_configs():
-    """
-    """
+    """Get global configurations."""
     global __CONFIGS
     return __CONFIGS
 
