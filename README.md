@@ -28,8 +28,8 @@ Currently, our inserted opaque predicates' obfuscation is a deterministic and im
 For either one of the three options, the obfuscated binary will be placed in \<filepath to the folder containing target source code\>.
 
 __NOTE__: Make sure the folder containing target source code has the following additional files: 
-* `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. [Here is a simple tutorial on how to write a Makefile](https://gist.github.com/yellowbyte/b2b61f547e51e80b30522a989e6ea88d).
-* `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file. [Here is a simple tutorial on how to write the GNUmakefile](docs/framac_setup.md).
+* `Makefile`: standard Makefile. The code will call `make` to compile the codebase after obfuscation. This is the default behavior but can be changed. [Here is a simple tutorial on how to write a Makefile](https://gist.github.com/yellowbyte/c23a6b25a4b3edf371777d21bd3dc7d0).
+* `GNUmakefile`: a Makefile with instructions on how to run Frama-C for the specified codebase. The number of value sets that can be inferred heavily depend on the settings in this file. [Here is a simple tutorial on how to write the Frama-C tailored GNUmakefile](docs/framac_setup.md).
   * Our dependence on Frama-C also means that our tool cannot obfuscate code that contains recursive calls, [as it is a limitation of Frama-C](https://www.frama-c.com/fc-plugins/eva.html).
 
 #### Settings
@@ -42,13 +42,13 @@ The option `-h` or `--help` will also give user information on the settings.
 
 #### Examples
 ```bash
-### [Option 1]: with `zfp`
+##### [Option 1]: with `zfp` #####
 # if you want to inspect metadata, use `zfptest` and the `--no-delmetadata` option
 yellowbyte:~/zero-footprint-opaque-predicates$ source scripts/zfpcmds 
 yellowbyte:~/zero-footprint-opaque-predicates$ zfp --limits 30000 ./dataset/01_simple_if
 ...
 
-### [Option 2]: with `zfptest`
+##### [Option 2]: with `zfptest` #####
 yellowbyte:~/zero-footprint-opaque-predicates$ source scripts/zfpcmds 
 yellowbyte:~/zero-footprint-opaque-predicates$ zfptest ./dataset/01_simple_if
 # inside Docker container
@@ -58,7 +58,7 @@ root@dfe5e978cd2b:/zfp# exit
 # zfpstop to stop and remove container
 yellowbyte:~/zero-footprint-opaque-predicates$ zfpstop
 
-### [Option 3]: running without using our container
+##### [Option 3]: running without using our container #####
 yellowbyte:~/zero-footprint-opaque-predicates$ python3 zfp.py --no-delmetadata ./dataset/01_simple_if
 ...
 ```
