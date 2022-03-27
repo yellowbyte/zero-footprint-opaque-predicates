@@ -1,6 +1,6 @@
 ## What Is Zero Footprint Opaque Predicates?
 
-For a detailed explanation, check out our [paper](https://rdcu.be/cpnNf). But if you just want a simplified explanation, this page is for you! For another perspective, [I also tweeted a thread on this project a while back](https://twitter.com/yujyet/status/1418059114874343432). This page is another interpretation of what this project is. The aim is to simplify understanding the "what", "why", and "how" questions regarding this project.
+For a detailed explanation, check out our [paper](https://rdcu.be/cpnNf). But if you just want a simplified explanation, this page is for you! The aim of this page is to simplify understanding the "what", "why", and "how" questions regarding this project.
 
 It's called Zero Footprint Opaque Predicates because the opaque predicates it constructs aim to resemble every other predicates typically found in an unobfuscated binary. 
 
